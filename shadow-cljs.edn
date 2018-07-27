@@ -1,0 +1,10 @@
+{:source-paths ["src"] 
+ :dependencies []
+ :builds {:server {:main cashflow-server.main/start!
+                :target :node-script
+                :output-to "out/cashflow-server.js"
+                :devtools {:after-load cashflow-server.main/start!
+                           :before-load cashflow-server.main/stop!}}
+          :test {:target    :node-test
+                 :output-to "out/cashflow-server-tests.js"
+                 :autorun   true}}}
