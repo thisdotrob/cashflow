@@ -2,12 +2,13 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :refer [<! >!] :as a]
             ["https" :as https]
+            ["fs" :as fs]
             ["express" :as express]))
 
 (defn error-handler [err, req, res, next]
   (-> res
       (.status 500)
-      (.send "Something broke!")))
+      (.send err.message)))
 
 (defn status [req res]
   (.json res (clj->js {:service "cashflow-server" :status "green"})))
@@ -28,24 +29,35 @@
             (.on res "end" #(go (a/close! ch)))))
     (a/reduce #(str %1 %2) "" ch)))
 
-(defn transactions [req res]
+(defn fetch-amex-transactions []
+  (let [ch (a/chan)]
+    (.readFile fs "amex.csv"
+                  "utf8"
+                  (fn [err data]
+                    (if (nil? err)
+                      (go (>! ch data))
+                      (throw "Error reading file"))))
+    ch))
+
+(defn starling-transactions [req res]
   (go
     (let [starling-transactions (<! (fetch-starling-transactions))]
       (.json res (.parse js/JSON starling-transactions)))))
 
+(defn amex-transactions [req res]
+  (go 
+    (let [amex-transactions (<! (fetch-amex-transactions))]
+      (.send res amex-transactions))))
+
 (def app
   (-> (express)
-      (.get "/transactions" transactions)
+      (.get "/starling-transactions" starling-transactions)
+      (.get "/amex-transactions" amex-transactions)
       (.use error-handler)))
 
 (defn start-server []
   (println "Starting server")
   (.listen app 3000 #(println "Cashflow server listening on port 3000")))
-
-;;(defn start! []
-;;  (go (println (<! (fetch-starling-transactions)))))
-;;
-;;(defn stop! [])
 
 (defonce server (atom nil))
 
