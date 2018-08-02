@@ -1,10 +1,15 @@
 {:source-paths ["src"] 
  :dependencies []
- :builds {:server {:main cashflow-server.main/start!
-                :target :node-script
-                :output-to "out/cashflow-server.js"
-                :devtools {:after-load cashflow-server.main/start!
-                           :before-load cashflow-server.main/stop!}}
-          :test {:target    :node-test
-                 :output-to "out/cashflow-server-tests.js"
-                 :autorun   true}}}
+ :builds {:server         {:main      cashflow-server.main/start!
+                           :target    :node-script
+                           :output-to "out/cashflow-server.js"
+                           :devtools  {:after-load cashflow-server.main/start!
+                                       :before-load cashflow-server.main/stop!}}
+          :test           {:target     :node-test
+                           :output-to "out/cashflow-server-tests.js"
+                           :autorun   true}
+          :starling-stub {:main       starling-stub.main/start!
+                          :target     :node-script
+                          :output-to  "out/starling-stub.js"
+                          :devtools   {:after-load starling-stub.main/start!
+                                       :before-load starling-stub.main/stop!}}}}

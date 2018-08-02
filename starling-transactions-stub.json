@@ -1,0 +1,75 @@
+{
+  "_links": {
+    "nextPage": {
+      "href": "NOT_YET_IMPLEMENTED"
+    }
+  },
+  "_embedded": {
+    "transactions": [
+      {
+        "_links": {
+          "detail": {
+            "href": "api/v1/transactions/direct-debit/746dbf02-9f31-4f32-a2e3-bb94dfbc7776",
+            "templated": false
+          }
+        },
+        "id": "746dbf02-9f31-4f32-a2e3-bb94dfbc7776",
+        "currency": "GBP",
+        "amount": -111.11,
+        "direction": "OUTBOUND",
+        "created": "2018-05-20T23:39:59.336Z",
+        "narrative": "Barclaycard",
+        "source": "DIRECT_DEBIT",
+        "balance": 100
+      },
+      {
+        "_links": {
+          "detail": {
+            "href": "api/v1/transactions/695e7d61-24f4-47ec-af7d-1eea7b6d1e8b",
+            "templated": false
+          }
+        },
+        "id": "695e7d61-24f4-47ec-af7d-1eea7b6d1e8b",
+        "currency": "GBP",
+        "amount": 222.22,
+        "direction": "INBOUND",
+        "created": "2018-05-18T09:15:21.000Z",
+        "narrative": "Cheque Deposit",
+        "source": "NOSTRO_DEPOSIT",
+        "balance": 322.22
+      },
+      {
+        "_links": {
+          "detail": {
+            "href": "api/v1/transactions/fps/out/3692a304-29cc-47f3-b9cd-a746903de0f0",
+            "templated": false
+          }
+        },
+        "id": "3692a304-29cc-47f3-b9cd-a746903de0f0",
+        "currency": "GBP",
+        "amount": -333.33,
+        "direction": "OUTBOUND",
+        "created": "2018-05-12T22:36:13.620Z",
+        "narrative": "yyyxxx",
+        "source": "FASTER_PAYMENTS_OUT",
+        "balance": -11.11
+      },
+      {
+        "_links": {
+          "detail": {
+            "href": "api/v1/transactions/mastercard/84c81871-fd6d-442a-9461-d7344b9bf0b0",
+            "templated": false
+          }
+        },
+        "id": "84c81871-fd6d-442a-9461-d7344b9bf0b0",
+        "currency": "GBP",
+        "amount": -5.5,
+        "direction": "OUTBOUND",
+        "created": "2018-05-11T13:18:38.256Z",
+        "narrative": "TfL",
+        "source": "MASTER_CARD",
+        "balance": -16.61
+      }
+    ]
+  }
+}
