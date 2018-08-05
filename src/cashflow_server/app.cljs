@@ -14,6 +14,6 @@
               (get-in initialized-routes [:transactions :starling]))
         (.get "/amex/transactions"
               (get-in initialized-routes [:transactions :amex]))
-        (.get "/starling/monthly-amounts"
+        (.get "/user/monthly-amounts"
               (get-in initialized-routes [:monthly-amounts :user]))
         (.use error-handler))))

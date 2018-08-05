@@ -5,14 +5,8 @@
             [cashflow-server.monthly-amounts :as monthly-amounts]
             [cljs.core.async :refer [<!]]))
 
-(defmacro defn-go [fname args & body]
-  `(defn ~fname ~args (go ~@body)))
-
 (defn route [env-vars f]
   (fn [req res] (go (.json res (<! (f env-vars))))))
-
-(defn-go amex-transactions [req res]
-  (.json res (<! (amex/transactions {:}))))
 
 (defn initialize [env-vars]
   {:transactions    {:starling (route env-vars starling/transactions)

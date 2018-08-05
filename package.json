@@ -16,8 +16,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "shadow-cljs": "^2.4.24",
-    "supertest": "^3.1.0"
+    "shadow-cljs": "^2.4.24"
   },
   "dependencies": {
     "express": "^4.16.3"
