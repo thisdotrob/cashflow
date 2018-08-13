@@ -10,10 +10,10 @@
 (defn create-app [env-vars]
   (let [initialized-routes (routes/initialize env-vars)]
     (-> (express)
-        (.get "/starling/transactions"
+        (.get "/transactions/starling"
               (get-in initialized-routes [:transactions :starling]))
-        (.get "/amex/transactions"
+        (.get "/transactions/amex"
               (get-in initialized-routes [:transactions :amex]))
-        (.get "/user/monthly-amounts"
-              (get-in initialized-routes [:monthly-amounts :user]))
+        (.get "/transactions/recurring"
+              (get-in initialized-routes [:transactions :recurring]))
         (.use error-handler))))

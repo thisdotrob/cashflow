@@ -15,7 +15,7 @@
 (def env-keys [:PORT
                :STARLING_HOST
                :STARLING_TOKEN
-               :MONTHLY_AMOUNTS_FILENAME
+               :RECURRING_TRANSACTIONS_FILENAME
                :AMEX_TRANSACTIONS_FILENAME])
 
 (defn start! []
