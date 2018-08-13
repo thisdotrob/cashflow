@@ -6,7 +6,7 @@
             [cljs.core.async :refer [<!]]))
 
 (defn route [env-vars f]
-  (fn [req res] (go (.json res (<! (f env-vars))))))
+  (fn [req res] (go (.send res (<! (f env-vars))))))
 
 (defn initialize [env-vars]
   {:transactions    {:starling (route env-vars starling/transactions)

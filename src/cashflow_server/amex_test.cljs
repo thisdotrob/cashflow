@@ -12,23 +12,20 @@
       (go
         (let [env-vars {:AMEX_TRANSACTIONS_FILENAME "amex-test-transactions.csv"}
               result (<! (sut/transactions env-vars))
-              expected [["20/05/2018"
-                         "Reference: AT181410028000010061619"
-                         " 4.25"
-                         "THE NATIONAL TRUST - GR HENLEY ON THAME"
-                         "NT GREYS COURT COWSHED TEAROOM Process Date 20/05/2018  NT GREYS COURT COWSHED TEAROOM"]
-                        ["13/05/2018"
-                         "Reference: AT181330035000010097120"
-                         " 12.61"
-                         "UBER *TRIP D6PRL HELP.UBER.COM"
-                         " Process Date 13/05/2018"]]]
-          (is (= (nth (first expected) 0) (nth (first result) 0)))
-          (is (= (nth (first expected) 1) (nth (first result) 1)))
-          (is (= (nth (first expected) 2) (nth (first result) 2)))
-          (is (= (nth (first expected) 3) (nth (first result) 3)))
-          (is (= (nth (first expected) 4) (nth (first result) 4)))
-          (is (= (nth (second expected) 0) (nth (second result) 0)))
-          (is (= (nth (second expected) 1) (nth (second result) 1)))
-          (is (= (nth (second expected) 2) (nth (second result) 2)))
-          (is (= (nth (second expected) 3) (nth (second result) 3)))
-          (is (= (nth (second expected) 4) (nth (second result) 4))))))))
+              expected [{:id "AT181410028000010061619"
+                         :date "2018-05-20"
+                         :narrative "THE NATIONAL TRUST - GR HENLEY ON THAME NT GREYS COURT COWSHED TEAROOM Process Date 20/05/2018  NT GREYS COURT COWSHED TEAROOM"
+                         :amount "4.25"}
+                        {:id "AT181330035000010097120"
+                         :date "2018-05-13"
+                         :narrative "UBER *TRIP D6PRL HELP.UBER.COM  Process Date 13/05/2018"
+                         :amount "12.61"}
+                        ]]
+          (is (= (:id (first expected)) (:id (first result))))
+          (is (= (:date (first expected)) (:date (first result))))
+          (is (= (:narrative (first expected)) (:narrative (first result))))
+          (is (= (:amount (first expected)) (:amount (first result))))
+          (is (= (:id (second expected)) (:id (second result))))
+          (is (= (:date (second expected)) (:date (second result))))
+          (is (= (:narrative (second expected)) (:narrative (second result))))
+          (is (= (:amount (second expected)) (:amount (second result)))))))))
