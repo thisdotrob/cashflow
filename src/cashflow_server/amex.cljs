@@ -18,7 +18,7 @@
 (defn amex-csv-row->transaction [row]
   {:id (amex-reference->id (nth row 1))
    :date (amex-date->date (nth row 0))
-   :narrative (str (nth row 3) " " (nth row 4))
+   :narrative (nth row 3)
    :amount (amex-amount->amount (nth row 2))})
 
 (defn transactions [{:keys [AMEX_TRANSACTIONS_FILENAME]}]
