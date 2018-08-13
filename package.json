@@ -4,13 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "watch-server": "shadow-cljs watch server",
-    "watch-stub": "shadow-cljs watch starling-stub",
+    "watch": "shadow-cljs watch server",
     "test": "shadow-cljs watch test",
     "repl": "shadow-cljs node-repl server",
     "release": "shadow-cljs release server",
-    "start-server": "nodemon out/cashflow-server.js",
-    "start-stub": "node out/starling-stub.js"
+    "start": "nodemon out/cashflow-server.js"
   },
   "keywords": [],
   "author": "",
