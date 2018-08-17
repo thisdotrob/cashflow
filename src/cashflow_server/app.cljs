@@ -10,6 +10,8 @@
 (defn create-app [env-vars]
   (let [initialized-routes (routes/initialize env-vars)]
     (-> (express)
+        (.get "/balances/starling"
+              (get-in initialized-routes [:balances :starling]))
         (.get "/transactions/starling"
               (get-in initialized-routes [:transactions :starling]))
         (.get "/transactions/amex"

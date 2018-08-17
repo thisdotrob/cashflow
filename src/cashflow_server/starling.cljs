@@ -13,6 +13,10 @@
    :narrative (get transaction "narrative")
    :amount (gstring/format "%.2f" (get transaction "amount"))})
 
+(defn starling-transaction->balance [transaction]
+  {:date (get transaction "created")
+   :amount (gstring/format "%.2f" (get transaction "balance"))})
+
 (defn transactions [{:keys [STARLING_HOST STARLING_TOKEN]}]
   (go
     (->> {:hostname STARLING_HOST
@@ -24,3 +28,15 @@
          js->clj
          (#(get-in % ["_embedded" "transactions"]))
          (map starling-transaction->transaction))))
+
+(defn balances [{:keys [STARLING_HOST STARLING_TOKEN]}]
+  (go
+    (->> {:hostname STARLING_HOST
+          :path "/api/v1/transactions"
+          :headers {:Authorization (str "Bearer " STARLING_TOKEN)}}
+         utils/https-get-async
+         <!
+         (.parse js/JSON)
+         js->clj
+         (#(get-in % ["_embedded" "transactions"]))
+         (map starling-transaction->balance))))
