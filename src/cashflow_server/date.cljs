@@ -16,3 +16,7 @@
 
 (defn get-day [date]
   (date/getDate date))
+
+(defn today []
+  (-> (js/Date.)
+      date->str))

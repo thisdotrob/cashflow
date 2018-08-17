@@ -8,7 +8,7 @@
                        :day "16"
                        :amount "300.00"}
           today "2018-08-15"
-          result (sut/future-transactions transaction today)]
+          result (sut/future-transactions today transaction )]
       (testing "returns 10 future transactions starting next month"
         (is (= 10 (count result)))
         (is (= "2018-08-16" (:date (nth result 0))))
@@ -26,7 +26,7 @@
                        :day "13"
                        :amount "300.00"}
           today "2018-08-15"
-          result (sut/future-transactions transaction today)]
+          result (sut/future-transactions today transaction)]
       (testing "returns 10 future transactions starting this month"
         (is (= 10 (count result)))
         (is (= "2018-09-13" (:date (nth result 0))))

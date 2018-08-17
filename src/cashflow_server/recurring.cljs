@@ -6,25 +6,33 @@
             [cashflow-server.date :as date]
             [cashflow-server.utils :as utils]))
 
-(defn future-transactions [transaction today]
-  (map (fn [months-to-add]
-         {:date      (-> today
-                         (date/add-months months-to-add)
-                         (date/set-day (:day transaction)))
-          :narrative (:narrative transaction)
-          :amount    (:amount transaction)})
-       (range (if (< (:day transaction) (date/get-day today))
-                1 0)
-              (if (< (:day transaction) (date/get-day today))
-                11 10))))
+(defn range-months-to-add [transaction today]
+  (if (< (:day transaction) (date/get-day today))
+    (range 1 11)
+    (range 0 10)))
+
+(defn future-transaction [today recurring-transaction months-to-add]
+  {:narrative (:narrative recurring-transaction)
+   :amount    (:amount recurring-transaction)
+   :date      (-> today
+                  (date/add-months months-to-add)
+                  (date/set-day (:day recurring-transaction)))})
+
+(defn future-transactions [today transaction]
+  (map #(future-transaction today transaction %)
+       (range-months-to-add transaction today)))
+
+(defn json->clj [json]
+  (js->clj (js-invoke js/JSON "parse" json) :keywordize-keys true))
+
+(defn read-file-async [filename]
+  (utils/js-invoke-async fs "readFile" filename "utf8"))
 
 (defn transactions [{:keys [RECURRING_TRANSACTIONS_FILENAME]}]
-  (go
-    (let [json-str (<! (utils/js-invoke-async fs
-                                              "readFile"
-                                              RECURRING_TRANSACTIONS_FILENAME
-                                              "utf8"))
-          parsed (js->clj (js-invoke js/JSON "parse" json-str)
-                          :keywordize-keys
-                          true)]
-      (map future-transactions parsed))))
+  (go (->> RECURRING_TRANSACTIONS_FILENAME
+           read-file-async
+           <!
+           json->clj
+           (map #(future-transactions (date/today) %))
+           flatten
+           (sort-by :date))))
