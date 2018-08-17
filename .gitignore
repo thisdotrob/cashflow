@@ -6,3 +6,4 @@ env.sh
 ofx.csv
 recurring.json
 .*.swp
+public/js
