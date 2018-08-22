@@ -2,7 +2,7 @@ node_modules
 .shadow-cljs
 .nrepl-port
 out
-env.sh
+.env
 ofx.csv
 recurring.json
 .*.swp

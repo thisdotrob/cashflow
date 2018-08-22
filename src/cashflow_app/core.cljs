@@ -6,65 +6,27 @@
 
 ;; -- Domino 1 Event Dispatch
 
-(defn dispatch-timer-event []
-  (let [now (js/Date.)]
-    (rf/dispatch [:timer now])))
-
-(defonce do-timer (js/setInterval dispatch-timer-event 1000))
-
 ;; -- Domino 2 - Event Handlers
 
 (rf/reg-event-db
  :initialize
  (fn [_ _]
-   {:time (js/Date.)
-    :time-color "#f88"}))
-
-(rf/reg-event-db
- :time-color-change
- (fn [db [_ new-color-value]]
-   (assoc db :time-color new-color-value)))
-
-(rf/reg-event-db
- :timer
- (fn [db [_ new-time]]
-   (assoc db :time new-time)))
-
+   {:amex-transactions []}))
 
 ;; -- Domino 4 - Query
-
-(rf/reg-sub
- :time
- (fn [db _]
-   (:time db)))
-
-(rf/reg-sub
- :time-color
- (fn [db _]
-   (:time-color db)))
 
 (rf/reg-sub
  ::active-panel
  (fn [db _]
    (:active-panel db)))
 
+(rf/reg-sub
+ ::amex-transactions
+ (fn [db _]
+   (:amex-transactions db)))
+
 
 ;; -- Domino 5 - View Functions
-
-(defn clock []
-  [:div.example-clock
-   {:style {:color @(rf/subscribe [:time-color])}}
-   (-> @(rf/subscribe [:time])
-       .toTimeString
-       (str/split " ")
-       first)])
-
-(defn color-input []
-  [:div.color-input
-   "Time color: "
-   [:input {:type "text"
-            :value @(rf/subscribe [:time-color])
-            :on-change #(rf/dispatch [:time-color-change (-> % .-target .-value)])}]])
 
 ;; home
 
@@ -78,12 +40,26 @@
   [:div "This is the About Page."
    [:div [:a {:href (routes/url-for :home)} "go to Home Page"]]])
 
+(defn transaction-row [{:as data :keys [id date narrative amount]}]
+  [:li
+   [:p date]
+   [:p narrative]
+   [:p amount]])
+
+(defn amex-transactions-panel []
+  [:div "This is the Amex Transactions Page."
+   [:div
+    [:ul
+     (for [transaction @(rf/subscribe [::amex-transactions])]
+       ^{:key (:id transaction)} [transaction-row transaction])]]])
+
 ;; main
 
 (defn- panels [panel-name]
   (case panel-name
     :home-panel [home-panel]
     :about-panel [about-panel]
+    :amex-transactions-panel [amex-transactions-panel]
     [:div]))
 
 (defn show-panel [panel-name]
@@ -95,9 +71,6 @@
 
 (defn ui []
   [:div
-   [:h1 "Hello world, it is now"]
-   [clock]
-   [color-input]
    [main-panel]])
 
 (defn render []
