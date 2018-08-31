@@ -2,11 +2,11 @@
   (:require [bidi.bidi :as bidi]
             [pushy.core :as pushy]
             [re-frame.core :as re-frame]
-            [cashflow-app.events :as events]))
+            [cashflow-app.event-handlers :as events]))
 
-(def routes ["/" {""                      :home
-                  "about"                 :about
-                  "transactions/" {"amex" :amex-transactions}}])
+(def routes ["/" {""                          :home
+                  "about"                     :about
+                  "transactions/" {"amex"     :amex-transactions}}])
 
 (defn- parse-url [url]
   (bidi/match-route routes url))
