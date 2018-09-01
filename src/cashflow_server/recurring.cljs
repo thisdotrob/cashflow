@@ -12,11 +12,15 @@
     (range 0 10)))
 
 (defn future-transaction [today recurring-transaction months-to-add]
-  {:narrative (:narrative recurring-transaction)
-   :amount    (:amount recurring-transaction)
-   :date      (-> today
-                  (date/add-months months-to-add)
-                  (date/set-day (:day recurring-transaction)))})
+  (let [{:keys [narrative amount day]} recurring-transaction
+        date (-> today
+                 (date/add-months months-to-add)
+                 (date/set-day day))
+        id (str narrative amount day date)]
+    {:narrative narrative
+     :amount amount
+     :date date
+     :id id}))
 
 (defn future-transactions [today transaction]
   (map #(future-transaction today transaction %)
