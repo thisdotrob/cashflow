@@ -39,12 +39,18 @@
     [:div "This is the Starling Transactions Page."
      [transactions-table transactions]]))
 
+(defn recurring-transactions-panel []
+  (let [transactions @(rf/subscribe [::subscriptions/recurring-transactions])]
+    [:div "This is the Recurring Transactions Page."
+     [transactions-table transactions]]))
+
 (defn- panels [panel-name]
   (case panel-name
     :home-panel [home-panel]
     :about-panel [about-panel]
     :amex-transactions-panel [amex-transactions-panel]
     :starling-transactions-panel [starling-transactions-panel]
+    :recurring-transactions-panel [recurring-transactions-panel]
     [:div]))
 
 (defn main-panel []

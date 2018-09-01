@@ -10,3 +10,13 @@
  ::amex-transactions
  (fn [db _]
    (:amex-transactions db)))
+
+(rf/reg-sub
+ ::starling-transactions
+ (fn [db _]
+   (:starling-transactions db)))
+
+(rf/reg-sub
+ ::recurring-transactions
+ (fn [db _]
+   (:recurring-transactions db)))
