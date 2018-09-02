@@ -5,7 +5,6 @@
             [cashflow-app.event-handlers :as events]))
 
 (def routes ["/" {""                           :home
-                  "about"                      :about
                   "transactions/" {"amex"      :amex-transactions
                                    "recurring" :recurring-transactions
                                    "starling"  :starling-transactions}}])
