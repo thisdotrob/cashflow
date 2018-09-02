@@ -22,48 +22,28 @@
                                    :http-xhrio {:method          :get
                                                 :uri             "http://localhost:3000/transactions/amex"
                                                 :response-format (ajax/json-response-format {:keywords? true})
-                                                :on-success      [:http-fetch-amex-transactions-success]
-                                                :on-failure      [:http-fetch-amex-transactions-fail]}}
+                                                :on-success      [:http-fetch-success :amex-transactions]
+                                                :on-failure      [:http-fetch-fail]}}
      :starling-transactions-data  {:db db
                                    :http-xhrio {:method          :get
                                                 :uri             "http://localhost:3000/transactions/starling"
                                                 :response-format (ajax/json-response-format {:keywords? true})
-                                                :on-success      [:http-fetch-starling-transactions-success]
-                                                :on-failure      [:http-fetch-starling-transactions-fail]}}
+                                                :on-success      [:http-fetch-success :starling-transactions]
+                                                :on-failure      [:http-fetch-fail]}}
      :recurring-transactions-data {:db db
                                    :http-xhrio {:method          :get
                                                 :uri             "http://localhost:3000/transactions/recurring"
                                                 :response-format (ajax/json-response-format {:keywords? true})
-                                                :on-success      [:http-fetch-recurring-transactions-success]
-                                                :on-failure      [:http-fetch-recurring-transactions-fail]}}
+                                                :on-success      [:http-fetch-success :recurring-transactions]
+                                                :on-failure      [:http-fetch-fail]}}
      db)))
 
 (rf/reg-event-db
-  :http-fetch-starling-transactions-success
-  (fn [db [_ transactions]]
-    (assoc db :starling-transactions transactions)))
+  :http-fetch-success
+  (fn [db [_ db-key data]]
+    (assoc db db-key data)))
 
 (rf/reg-event-db
-  :http-fetch-starling-transactions-fail
-  (fn [db [_ error-map]]
-    (assoc db :http-error error-map)))
-
-(rf/reg-event-db
-  :http-fetch-recurring-transactions-success
-  (fn [db [_ transactions]]
-    (assoc db :recurring-transactions transactions)))
-
-(rf/reg-event-db
-  :http-fetch-recurring-transactions-fail
-  (fn [db [_ error-map]]
-    (assoc db :http-error error-map)))
-
-(rf/reg-event-db
-  :http-fetch-amex-transactions-success
-  (fn [db [_ transactions]]
-    (assoc db :amex-transactions transactions)))
-
-(rf/reg-event-db
-  :http-fetch-amex-transactions-fail
+  :http-fetch-fail
   (fn [db [_ error-map]]
     (assoc db :http-error error-map)))
