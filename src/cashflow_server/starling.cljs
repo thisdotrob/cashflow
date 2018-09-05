@@ -7,17 +7,15 @@
             [clojure.string :as string]
             ["fs" :as fs]))
 
-(defn starling-transaction->transaction [transaction]
-  {:id (get transaction "id")
+(defn starling-transaction->transaction-and-balance [transaction]
+  {:source "Starling"
+   :id (get transaction "id")
    :date (subs (get transaction "created") 0 10)
    :narrative (get transaction "narrative")
-   :amount (gstring/format "%.2f" (get transaction "amount"))})
+   :amount (gstring/format "%.2f" (get transaction "amount"))
+   :balance (gstring/format "%.2f" (get transaction "balance"))})
 
-(defn starling-transaction->balance [transaction]
-  {:date (get transaction "created")
-   :amount (gstring/format "%.2f" (get transaction "balance"))})
-
-(defn transactions [{:keys [STARLING_HOST STARLING_TOKEN]}]
+(defn transactions-and-balances [{:keys [STARLING_HOST STARLING_TOKEN]}]
   (go
     (->> {:hostname STARLING_HOST
           :path "/api/v1/transactions"
@@ -27,16 +25,4 @@
          (.parse js/JSON)
          js->clj
          (#(get-in % ["_embedded" "transactions"]))
-         (map starling-transaction->transaction))))
-
-(defn balances [{:keys [STARLING_HOST STARLING_TOKEN]}]
-  (go
-    (->> {:hostname STARLING_HOST
-          :path "/api/v1/transactions"
-          :headers {:Authorization (str "Bearer " STARLING_TOKEN)}}
-         utils/https-get-async
-         <!
-         (.parse js/JSON)
-         js->clj
-         (#(get-in % ["_embedded" "transactions"]))
-         (map starling-transaction->balance))))
+         (map starling-transaction->transaction-and-balance))))

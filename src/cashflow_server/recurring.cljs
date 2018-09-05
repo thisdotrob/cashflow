@@ -17,7 +17,8 @@
                  (date/add-months months-to-add)
                  (date/set-day day))
         id (str narrative amount day date)]
-    {:narrative narrative
+    {:source "Recurring"
+     :narrative narrative
      :amount amount
      :date date
      :id id}))

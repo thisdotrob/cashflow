@@ -7,35 +7,50 @@
 (rf/reg-event-db
  :initialize
  (fn [_ _]
-   {:amex-transactions []}))
+   {:computed-balance-start-id "07970b9b-8c9a-443b-becc-ec4c3611751c"
+    :amex-transactions []
+    :starling-transactions-and-balances []
+    :recurring-transactions []}))
 
 (rf/reg-event-db
  :set-active-panel
  (fn [db [_ active-panel]]
    (assoc db :active-panel active-panel)))
 
+(def amex-transactions-data-http-opts {:method          :get
+                                       :uri             "http://localhost:3000/transactions/amex"
+                                       :response-format (ajax/json-response-format {:keywords? true})
+                                       :on-success      [:http-fetch-success :amex-transactions]
+                                       :on-failure      [:http-fetch-fail]})
+
+(def starling-transactions-and-balances-data-http-opts {:method          :get
+                                                        :uri             "http://localhost:3000/transactions-and-balances/starling"
+                                                        :response-format (ajax/json-response-format {:keywords? true})
+                                                        :on-success      [:http-fetch-success :starling-transactions-and-balances]
+                                                        :on-failure      [:http-fetch-fail]})
+
+(def recurring-transactions-data-http-opts {:method          :get
+                                            :uri             "http://localhost:3000/transactions/recurring"
+                                            :response-format (ajax/json-response-format {:keywords? true})
+                                            :on-success      [:http-fetch-success :recurring-transactions]
+                                            :on-failure      [:http-fetch-fail]})
+
 (rf/reg-event-fx
  :request-active-data
  (fn [{:keys [db]} [_ data-name]]
    (case data-name
-     :amex-transactions-data      {:db db
-                                   :http-xhrio {:method          :get
-                                                :uri             "http://localhost:3000/transactions/amex"
-                                                :response-format (ajax/json-response-format {:keywords? true})
-                                                :on-success      [:http-fetch-success :amex-transactions]
-                                                :on-failure      [:http-fetch-fail]}}
-     :starling-transactions-data  {:db db
-                                   :http-xhrio {:method          :get
-                                                :uri             "http://localhost:3000/transactions/starling"
-                                                :response-format (ajax/json-response-format {:keywords? true})
-                                                :on-success      [:http-fetch-success :starling-transactions]
-                                                :on-failure      [:http-fetch-fail]}}
-     :recurring-transactions-data {:db db
-                                   :http-xhrio {:method          :get
-                                                :uri             "http://localhost:3000/transactions/recurring"
-                                                :response-format (ajax/json-response-format {:keywords? true})
-                                                :on-success      [:http-fetch-success :recurring-transactions]
-                                                :on-failure      [:http-fetch-fail]}}
+     :amex-transactions-data                   {:db db
+                                                :http-xhrio amex-transactions-data-http-opts}
+     :starling-transactions-data               {:db db
+                                                :http-xhrio starling-transactions-and-balances-data-http-opts}
+     :starling-transactions-and-balances-data  {:db db
+                                                :http-xhrio starling-transactions-and-balances-data-http-opts}
+     :recurring-transactions-data              {:db db
+                                                :http-xhrio recurring-transactions-data-http-opts}
+     :cashflow-data                            {:db db
+                                                :http-xhrio [amex-transactions-data-http-opts
+                                                             starling-transactions-and-balances-data-http-opts
+                                                             recurring-transactions-data-http-opts]}
      db)))
 
 (rf/reg-event-db

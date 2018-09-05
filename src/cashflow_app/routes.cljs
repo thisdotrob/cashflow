@@ -5,9 +5,11 @@
             [cashflow-app.event-handlers :as events]))
 
 (def routes ["/" {""                           :home
-                  "transactions/" {"amex"      :amex-transactions
-                                   "recurring" :recurring-transactions
-                                   "starling"  :starling-transactions}}])
+                  "cashflow"                   :cashflow
+                  "transactions-and-balances/" {"starling"  :starling-transactions-and-balances}
+                  "transactions/"              {"starling"  :starling-transactions
+                                                "amex"      :amex-transactions
+                                                "recurring" :recurring-transactions}}])
 
 (defn- parse-url [url]
   (bidi/match-route routes url))

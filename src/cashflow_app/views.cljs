@@ -7,30 +7,67 @@
 (defn nav-section []
   [:div
    [:ul
-    [:li [:a {:href (routes/url-for :starling-transactions)} "starling transactions"]]
+    [:li [:a {:href (routes/url-for :starling-transactions-and-balances)} "starling transactions and balances"]]
     [:li [:a {:href (routes/url-for :amex-transactions)} "amex transactions"]]
-    [:li [:a {:href (routes/url-for :recurring-transactions)} "recurring transactions"]]]])
+    [:li [:a {:href (routes/url-for :starling-transactions)} "starling transactions"]]
+    [:li [:a {:href (routes/url-for :recurring-transactions)} "recurring transactions"]]
+    [:li [:a {:href (routes/url-for :cashflow)} "cashflow"]]]])
 
 (defn home-panel []
   [:div (str "This is the Home Page.")
    [nav-section]])
 
-(defn transaction-row [{:as data :keys [id date narrative amount]}]
+(def transactions-header
+  [:thead
+   [:tr
+    [:td "Source"]
+    [:td "Date"]
+    [:td "Desc"]
+    [:td "Amount"]]])
+
+(defn transactions-row [{:as data :keys [source id date narrative amount]}]
   [:tr
+   [:td source]
    [:td date]
    [:td narrative]
    [:td amount]])
 
 (defn transactions-table [transactions]
-  [:table {:style {:width "75%"}}
-   [:thead
-    [:tr
-     [:td "Date"]
-     [:td "Desc"]
-     [:td "Amount"]]]
+  [:table {:style {:width "50%"}}
+   transactions-header
    [:tbody
     (for [transaction transactions]
-      ^{:key (:id transaction)} [transaction-row transaction])]])
+      ^{:key (:id transaction)} [transactions-row transaction])]])
+
+(def transactions-and-balances-header
+  [:thead
+   [:tr
+    [:td "Source"]
+    [:td "Date"]
+    [:td "Desc"]
+    [:td "Amount"]
+    [:td "Balance"]]])
+
+(defn transactions-and-balances-row [{:as data :keys [source id date narrative amount balance]}]
+  [:tr
+   [:td source]
+   [:td date]
+   [:td narrative]
+   [:td amount]
+   [:td balance]])
+
+(defn transactions-and-balances-table [transactions-and-balances]
+  [:table {:style {:width "50%"}}
+   transactions-and-balances-header
+   [:tbody
+    (for [transaction-and-balance transactions-and-balances]
+      ^{:key (:id transaction-and-balance)} [transactions-and-balances-row transaction-and-balance])]])
+
+(defn starling-transactions-panel []
+  (let [transactions @(rf/subscribe [::subscriptions/starling-transactions])]
+    [:div "This is the Starling Transactions Page."
+     [transactions-table transactions]
+     [nav-section]]))
 
 (defn amex-transactions-panel []
   (let [transactions @(rf/subscribe [::subscriptions/amex-transactions])]
@@ -38,10 +75,10 @@
      [transactions-table transactions]
      [nav-section]]))
 
-(defn starling-transactions-panel []
-  (let [transactions @(rf/subscribe [::subscriptions/starling-transactions])]
-    [:div "This is the Starling Transactions Page."
-     [transactions-table transactions]
+(defn starling-transactions-and-balances-panel []
+  (let [transactions-and-balances @(rf/subscribe [::subscriptions/starling-transactions-and-balances])]
+    [:div "This is the Starling Transactions and Balances Page."
+     [transactions-and-balances-table transactions-and-balances]
      [nav-section]]))
 
 (defn recurring-transactions-panel []
@@ -50,11 +87,19 @@
      [transactions-table transactions]
      [nav-section]]))
 
+(defn cashflow-panel []
+  (let [transactions-and-balances @(rf/subscribe [::subscriptions/all-transactions-with-computed-balances])]
+    [:div "This is the Cashflow Page."
+     [transactions-and-balances-table transactions-and-balances]
+     [nav-section]]))
+
 (defn- panels [panel-name]
   (case panel-name
     :home-panel [home-panel]
+    :cashflow-panel [cashflow-panel]
     :amex-transactions-panel [amex-transactions-panel]
     :starling-transactions-panel [starling-transactions-panel]
+    :starling-transactions-and-balances-panel [starling-transactions-and-balances-panel]
     :recurring-transactions-panel [recurring-transactions-panel]
     [:div]))
 
