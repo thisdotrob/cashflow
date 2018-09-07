@@ -88,7 +88,7 @@
      [nav-section]]))
 
 (defn cashflow-panel []
-  (let [transactions-and-balances @(rf/subscribe [::subscriptions/all-transactions-with-computed-balances])]
+  (let [transactions-and-balances @(rf/subscribe [::subscriptions/cashflow-transactions-and-balances])]
     [:div "This is the Cashflow Page."
      [transactions-and-balances-table transactions-and-balances]
      [nav-section]]))

@@ -72,7 +72,7 @@
                              starling-transactions-and-balances)))))
 
 (rf/reg-sub
-  ::all-transactions-with-computed-balances
+  ::cashflow-transactions-and-balances
   :<- [::all-transactions-sorted]
   :<- [::computed-balance-start-id]
   :<- [::computed-balance-start-amount]
@@ -90,9 +90,11 @@
                                   (>= date computed-balance-start-date) (str (+ (int prev-balance) ;; NOT INT!!!!
                                                                                 (int amount)))
                                   :else prev-balance)]
-                (conj transactions
-                      (assoc transaction
-                             :balance
-                             new-balance))))
+                (if (>= date computed-balance-start-date)
+                  (conj transactions
+                        (assoc transaction
+                               :balance
+                               new-balance))
+                  transactions)))
             []
             all-transactions-sorted)))
