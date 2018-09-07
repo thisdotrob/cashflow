@@ -10,7 +10,7 @@
 (defn starling-transaction->transaction-and-balance [transaction]
   {:source "Starling"
    :id (get transaction "id")
-   :date (subs (get transaction "created") 0 10)
+   :date (get transaction "created")
    :narrative (get transaction "narrative")
    :amount (gstring/format "%.2f" (get transaction "amount"))
    :balance (gstring/format "%.2f" (get transaction "balance"))})

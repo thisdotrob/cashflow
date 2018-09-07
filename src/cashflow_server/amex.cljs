@@ -13,7 +13,9 @@
   (subs reference 11))
 
 (defn amex-date->date [date]
-  (string/join "-" (reverse (string/split date "/"))))
+  (str (string/join "-"
+                    (reverse (string/split date "/")))
+       "T23:59:59.999Z"))
 
 (defn amex-csv-row->transaction [row]
   {:source "Amex"

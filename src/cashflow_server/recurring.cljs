@@ -15,7 +15,8 @@
   (let [{:keys [narrative amount day]} recurring-transaction
         date (-> today
                  (date/add-months months-to-add)
-                 (date/set-day day))
+                 (date/set-day day)
+                 (str "T23:59:59.999Z"))
         id (str narrative amount day date)]
     {:source "Recurring"
      :narrative narrative

@@ -7,7 +7,7 @@
 (rf/reg-event-db
  :initialize
  (fn [_ _]
-   {:computed-balance-start-id "07970b9b-8c9a-443b-becc-ec4c3611751c"
+   {:computed-balance-start-id "10ef32c6-302a-4551-b514-1c78ea2af25d"
     :amex-transactions []
     :starling-transactions-and-balances []
     :recurring-transactions []}))
