@@ -13,6 +13,23 @@
     (apply f (conj (vec args) cb))
     async-ch))
 
+(defn asyncify-prom [f]
+  (fn [& args]
+    (let [async-ch (a/chan)
+          prom (apply f args)]
+      (.then prom (fn [result] (go (>! async-ch result))))
+      async-ch)))
+
+(defn asyncify-cb [f]
+  (fn [& args]
+    (let [async-ch (a/chan)
+          cb (fn [err result] (if (nil? err)
+                                (go (>! async-ch result))
+                                (throw err)))
+          args-cb-at-tail (conj (vec args) cb)]
+      (apply f args-cb-at-tail)
+      async-ch)))
+
 (defn https-get-async [{:keys [hostname path headers]}]
   (let [ch (a/chan)
         opts {:hostname hostname
