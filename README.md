@@ -7,10 +7,14 @@ The following environment variables must be set:
 - STARLING_TOKEN
 - RECURRING_TRANSACTIONS_FILENAME
 - AMEX_TRANSACTIONS_FILENAME
+- AMEX_TRANSACTIONS_PATH
+- AMEX_USERNAME
+- AMEX_PASSWORD
 
-To run the server open a new terminal window and enter `npm run server-watch`
-until you see "Build completed." Now run `npm run server-start`. The server will
-now be listening on port 3000.
+First scrape the amex transactions using `npm run amex-scrape` until you see "Finished!".
 
-To run the browser app, run `npm run app-watch`. Once you see "Build completed."
-you can load the app at `http://localhost:8020`.
+Next enter `npm run server-watch` until you see "Build completed."
+
+Next run `npm run server-start` in a separate terminal. The server will now be listening on port 3000.
+
+Next run `npm run app-watch` in a seperate terminal. Once you see "Build completed." you can load the app at `http://localhost:8020`.
