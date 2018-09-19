@@ -13,6 +13,7 @@
     "server-test": "shadow-cljs watch test",
     "server-release": "shadow-cljs release server",
     "server-start": "nodemon out/cashflow-server.js",
+    "amex-scrape": "node amex-scrape-puppeteer.js",
     "app-watch": "shadow-cljs watch app"
   },
   "keywords": [],
@@ -26,6 +27,7 @@
     "create-react-class": "^15.6.3",
     "date-fns": "^1.29.0",
     "express": "^4.16.3",
+    "puppeteer": "^1.8.0",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-flip-move": "^3.0.2",

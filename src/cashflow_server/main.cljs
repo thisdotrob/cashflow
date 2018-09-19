@@ -16,7 +16,8 @@
                :STARLING_HOST
                :STARLING_TOKEN
                :RECURRING_TRANSACTIONS_FILENAME
-               :AMEX_TRANSACTIONS_FILENAME])
+               :AMEX_TRANSACTIONS_FILENAME
+               :AMEX_TRANSACTIONS_PATH])
 
 (defn start! []
   (->> env-keys

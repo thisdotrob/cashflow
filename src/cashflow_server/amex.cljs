@@ -24,10 +24,12 @@
    :narrative (nth row 3)
    :amount (amex-amount->amount (nth row 2))})
 
-(defn transactions [{:keys [AMEX_TRANSACTIONS_FILENAME]}]
+(defn transactions [{:keys [AMEX_TRANSACTIONS_PATH AMEX_TRANSACTIONS_FILENAME]}]
   (go
     (map amex-csv-row->transaction
          (csv/parse (<! (utils/js-invoke-async fs
                                                "readFile"
-                                               AMEX_TRANSACTIONS_FILENAME
+                                               (str AMEX_TRANSACTIONS_PATH
+                                                    "/"
+                                                    AMEX_TRANSACTIONS_FILENAME)
                                                "utf8"))))))
