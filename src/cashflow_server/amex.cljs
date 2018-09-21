@@ -7,7 +7,11 @@
             [cashflow-server.utils :as utils]))
 
 (defn amex-amount->amount [amount]
-  (string/trim amount))
+  (-> amount
+      string/trim
+      int
+      (* -1)
+      str))
 
 (defn amex-reference->id [reference]
   (subs reference 11))
