@@ -71,6 +71,34 @@
     (:balance (first (filter (fn [{:keys [id]}] (= start-id id))
                              starling-transactions-and-balances)))))
 
+(defn new-computed-balance [prev-balance
+                            {:as transaction :keys [amount date id]}
+                            computed-balance-start-id
+                            computed-balance-start-amount
+                            computed-balance-start-date]
+  (cond
+    (= id computed-balance-start-id)      computed-balance-start-amount
+    (>= date computed-balance-start-date) (str (+ (int prev-balance)
+                                                  (int amount)))
+    :else prev-balance))
+
+(defn prev-balance [transactions]
+  (or (:balance (peek transactions)) "0"))
+
+(defn cashflow-transaction
+  [transactions
+   transaction
+   computed-balance-start-id
+   computed-balance-start-amount
+   computed-balance-start-date]
+  (assoc transaction
+         :balance
+         (new-computed-balance (prev-balance transactions)
+                               transaction
+                               computed-balance-start-id
+                               computed-balance-start-amount
+                               computed-balance-start-date)))
+
 (rf/reg-sub
   ::cashflow-transactions-and-balances
   :<- [::all-transactions-sorted]
@@ -82,19 +110,15 @@
         computed-balance-start-amount
         computed-balance-start-date]
        _]
-    (reduce (fn [transactions
-                 {:as transaction :keys [id date amount]}]
-              (let [prev-balance (or (:balance (peek transactions)) "0")
-                    new-balance (cond
-                                  (= id computed-balance-start-id) computed-balance-start-amount
-                                  (>= date computed-balance-start-date) (str (+ (int prev-balance) ;; NOT INT!!!!
-                                                                                (int amount)))
-                                  :else prev-balance)]
-                (if (>= date computed-balance-start-date)
-                  (conj transactions
-                        (assoc transaction
-                               :balance
-                               new-balance))
-                  transactions)))
+    (reduce (fn [transactions transaction
+                 {:as transaction :keys [date]}]
+              (if (>= date computed-balance-start-date)
+                (conj transactions
+                      (cashflow-transaction transactions
+                                            transaction
+                                            computed-balance-start-id
+                                            computed-balance-start-amount
+                                            computed-balance-start-date))
+                transactions))
             []
             all-transactions-sorted)))
