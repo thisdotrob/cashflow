@@ -136,6 +136,6 @@
                                             computed-balance-start-id
                                             computed-balance-start-amount
                                             computed-balance-start-date))
-                transactions))
+                (conj transactions transaction)))
             []
             all-transactions-sorted)))
