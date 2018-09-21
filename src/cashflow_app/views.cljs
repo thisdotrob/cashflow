@@ -1,6 +1,6 @@
 (ns cashflow-app.views
   (:require [re-frame.core :as rf]
-            [clojure.string :as str]
+            [clojure.string :as string]
             [cashflow-app.subscriptions :as subscriptions]
             [cashflow-app.routes :as routes]))
 
@@ -46,7 +46,8 @@
     [:td "Date"]
     [:td "Desc"]
     [:td "Amount"]
-    [:td "Balance"]]])
+    [:td "Balance"]
+    [:td "Start Transaction?"]]])
 
 (defn transactions-and-balances-row [{:as data :keys [source id date narrative amount balance]}]
   [:tr
@@ -54,7 +55,8 @@
    [:td date]
    [:td narrative]
    [:td amount]
-   [:td balance]])
+   [:td balance]
+   [:td {:on-click #(rf/dispatch [:set-computed-balance-start-id id])} "X"]])
 
 (defn transactions-and-balances-table [transactions-and-balances]
   [:table {:style {:width "50%"}}

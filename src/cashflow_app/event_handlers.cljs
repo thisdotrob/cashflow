@@ -62,3 +62,8 @@
   :http-fetch-fail
   (fn [db [_ error-map]]
     (assoc db :http-error error-map)))
+
+(rf/reg-event-db
+  :set-computed-balance-start-id
+  (fn [db [_ id]]
+       (assoc db :computed-balance-start-id id)))
