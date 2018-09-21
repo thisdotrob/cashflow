@@ -49,10 +49,16 @@
     [:td "Balance"]
     [:td "Start Transaction?"]]])
 
+(defn display-date [iso-string-date]
+  (-> iso-string-date
+      (string/replace #"T" " ")
+      (string/replace #"Z" " ")
+      (subs 0 16)))
+
 (defn transactions-and-balances-row [{:as data :keys [source id date narrative amount balance]}]
   [:tr
    [:td source]
-   [:td date]
+   [:td (display-date date)]
    [:td narrative]
    [:td amount]
    [:td balance]
