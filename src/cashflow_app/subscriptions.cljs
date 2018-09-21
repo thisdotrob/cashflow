@@ -92,8 +92,11 @@
                             computed-balance-start-date]
   (cond
     (= id computed-balance-start-id)      computed-balance-start-amount
-    (>= date computed-balance-start-date) (str (+ (int prev-balance)
-                                                  (int amount)))
+    (>= date computed-balance-start-date) (-> (+ (js/parseFloat prev-balance) (js/parseFloat amount))
+                                              (* 100)
+                                              Math/round
+                                              (/ 100)
+                                              str)
     :else prev-balance))
 
 (defn prev-balance [transactions]
