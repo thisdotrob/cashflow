@@ -12,6 +12,13 @@
    (:amex-transactions db)))
 
 (rf/reg-sub
+  ::amex-transactions-excluding-repayments
+  :<- [::amex-transactions]
+  (fn [amex-transactions _]
+    (filter #(-> % :narrative (not= "PAYMENT RECEIVED - THANK YOU"))
+            amex-transactions)))
+
+(rf/reg-sub
  ::starling-transactions-and-balances
  (fn [db _]
    (:starling-transactions-and-balances db)))
@@ -23,6 +30,13 @@
     (map #(dissoc % :balance) starling-transactions-and-balances)))
 
 (rf/reg-sub
+  ::starling-transactions-excluding-amex-repayments
+  :<- [::starling-transactions]
+  (fn [starling-transactions _]
+    (filter #(-> % :narrative (not= "American Express"))
+            starling-transactions)))
+
+(rf/reg-sub
  ::recurring-transactions
  (fn [db _]
    (:recurring-transactions db)))
@@ -30,8 +44,8 @@
 (rf/reg-sub
  ::all-transactions
  :<- [::recurring-transactions]
- :<- [::starling-transactions]
- :<- [::amex-transactions]
+ :<- [::starling-transactions-excluding-amex-repayments]
+ :<- [::amex-transactions-excluding-repayments]
  (fn [[recurring-transactions
        starling-transactions
        amex-transactions] _]
