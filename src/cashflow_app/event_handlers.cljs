@@ -5,12 +5,12 @@
             [cashflow-app.stub-data :as stub-data]))
 
 (rf/reg-event-db
- :initialize
+ :initialise-db
  (fn [_ _]
-   {:computed-balance-start-id "10ef32c6-302a-4551-b514-1c78ea2af25d"
-    :amex-transactions []
-    :starling-transactions-and-balances []
-    :recurring-transactions []}))
+   {:db {:computed-balance-start-id "10ef32c6-302a-4551-b514-1c78ea2af25d"
+         :amex-transactions []
+         :starling-transactions-and-balances []
+         :recurring-transactions []}}))
 
 (rf/reg-event-db
  :set-active-panel

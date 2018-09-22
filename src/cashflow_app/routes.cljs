@@ -20,7 +20,7 @@
     (re-frame/dispatch [:request-active-data data-name])
     (re-frame/dispatch [:set-active-panel panel-name])))
 
-(defn app-routes[]
+(defn app-routes []
   (pushy/start! (pushy/pushy dispatch-route parse-url)))
 
 (def url-for (partial bidi/path-for routes))

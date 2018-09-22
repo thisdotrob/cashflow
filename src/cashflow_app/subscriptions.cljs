@@ -2,6 +2,13 @@
   (:require [re-frame.core :as rf]))
 
 (rf/reg-sub
+  ::initialising?
+  (fn [db _]
+    (if db
+      false
+      true)))
+
+(rf/reg-sub
  ::active-panel
  (fn [db _]
    (:active-panel db)))
