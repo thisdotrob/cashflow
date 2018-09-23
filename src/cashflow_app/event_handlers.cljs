@@ -2,8 +2,7 @@
   (:require [re-frame.core :as rf]
             [day8.re-frame.http-fx]
             [ajax.core :as ajax]
-            [day8.re-frame.tracing :refer-macros [fn-traced]]
-            [cashflow-app.stub-data :as stub-data]))
+            [day8.re-frame.tracing :refer-macros [fn-traced]]))
 
 (rf/reg-event-db
  :initialise-db
