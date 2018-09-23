@@ -52,7 +52,7 @@
                                                 :http-xhrio [amex-transactions-data-http-opts
                                                              starling-transactions-and-balances-data-http-opts
                                                              recurring-transactions-data-http-opts]}
-     db)))
+     {:db db})))
 
 (rf/reg-event-db
   :http-fetch-success
