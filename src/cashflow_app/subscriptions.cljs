@@ -2,57 +2,57 @@
   (:require [re-frame.core :as rf]))
 
 (rf/reg-sub
-  ::initialising?
+  :initialising?
   (fn [db _]
     (if db
       false
       true)))
 
 (rf/reg-sub
- ::active-panel
+ :active-panel
  (fn [db _]
    (:active-panel db)))
 
 (rf/reg-sub
- ::amex-transactions
+ :amex-transactions
  (fn [db _]
    (:amex-transactions db)))
 
 (rf/reg-sub
-  ::amex-transactions-excluding-repayments
-  :<- [::amex-transactions]
+  :amex-transactions-excluding-repayments
+  :<- [:amex-transactions]
   (fn [amex-transactions _]
     (filter #(-> % :narrative (not= "PAYMENT RECEIVED - THANK YOU"))
             amex-transactions)))
 
 (rf/reg-sub
- ::starling-transactions-and-balances
+ :starling-transactions-and-balances
  (fn [db _]
    (:starling-transactions-and-balances db)))
 
 (rf/reg-sub
-  ::starling-transactions
-  :<- [::starling-transactions-and-balances]
+  :starling-transactions
+  :<- [:starling-transactions-and-balances]
   (fn [starling-transactions-and-balances _]
     (map #(dissoc % :balance) starling-transactions-and-balances)))
 
 (rf/reg-sub
-  ::starling-transactions-excluding-amex-repayments
-  :<- [::starling-transactions]
+  :starling-transactions-excluding-amex-repayments
+  :<- [:starling-transactions]
   (fn [starling-transactions _]
     (filter #(-> % :narrative (not= "American Express"))
             starling-transactions)))
 
 (rf/reg-sub
- ::recurring-transactions
+ :recurring-transactions
  (fn [db _]
    (:recurring-transactions db)))
 
 (rf/reg-sub
- ::all-transactions
- :<- [::recurring-transactions]
- :<- [::starling-transactions-excluding-amex-repayments]
- :<- [::amex-transactions-excluding-repayments]
+ :all-transactions
+ :<- [:recurring-transactions]
+ :<- [:starling-transactions-excluding-amex-repayments]
+ :<- [:amex-transactions-excluding-repayments]
  (fn [[recurring-transactions
        starling-transactions
        amex-transactions] _]
@@ -61,33 +61,33 @@
            amex-transactions)))
 
 (rf/reg-sub
- ::all-transactions-sorted
- :<- [::all-transactions]
+ :all-transactions-sorted
+ :<- [:all-transactions]
  (fn [all-transactions _]
    (sort-by :date all-transactions)))
 
 (rf/reg-sub
-  ::start-date
+  :start-date
   (fn [db _]
     (:start-date db)))
 
 (rf/reg-sub
-  ::computed-balance-start-id
+  :computed-balance-start-id
   (fn [db _]
     (:computed-balance-start-id db)))
 
 (rf/reg-sub
-  ::computed-balance-start-date
-  :<- [::computed-balance-start-id]
-  :<- [::all-transactions]
+  :computed-balance-start-date
+  :<- [:computed-balance-start-id]
+  :<- [:all-transactions]
   (fn [[computed-balance-start-id all-transactions] _]
     (:date (first (filter (fn [{:keys [id]}] (= computed-balance-start-id id))
                           all-transactions)))))
 
 (rf/reg-sub
-  ::computed-balance-start-amount
-  :<- [::computed-balance-start-id]
-  :<- [::starling-transactions-and-balances]
+  :computed-balance-start-amount
+  :<- [:computed-balance-start-id]
+  :<- [:starling-transactions-and-balances]
   (fn [[start-id starling-transactions-and-balances] _]
     (:balance (first (filter (fn [{:keys [id]}] (= start-id id))
                              starling-transactions-and-balances)))))
@@ -124,11 +124,11 @@
                                computed-balance-start-date)))
 
 (rf/reg-sub
-  ::cashflow-transactions-and-balances
-  :<- [::all-transactions-sorted]
-  :<- [::computed-balance-start-id]
-  :<- [::computed-balance-start-amount]
-  :<- [::computed-balance-start-date]
+  :cashflow-transactions-and-balances
+  :<- [:all-transactions-sorted]
+  :<- [:computed-balance-start-id]
+  :<- [:computed-balance-start-amount]
+  :<- [:computed-balance-start-date]
   (fn [[all-transactions-sorted
         computed-balance-start-id
         computed-balance-start-amount

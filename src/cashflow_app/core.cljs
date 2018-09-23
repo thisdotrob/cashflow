@@ -6,7 +6,7 @@
             [cashflow-app.routes :as routes]))
 
 (defn ui []
-  (let [initialising? (rf/subscribe [::subscriptions/initialising?])]
+  (let [initialising? (rf/subscribe [:initialising?])]
     (if @initialising?
       [:div "Initialising..."]
       [:div [views/main-panel]])))

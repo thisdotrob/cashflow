@@ -72,31 +72,31 @@
       ^{:key (:id transaction-and-balance)} [transactions-and-balances-row transaction-and-balance])]])
 
 (defn starling-transactions-panel []
-  (let [transactions @(rf/subscribe [::subscriptions/starling-transactions])]
+  (let [transactions @(rf/subscribe [:starling-transactions])]
     [:div "This is the Starling Transactions Page."
      [transactions-table transactions]
      [nav-section]]))
 
 (defn amex-transactions-panel []
-  (let [transactions @(rf/subscribe [::subscriptions/amex-transactions])]
+  (let [transactions @(rf/subscribe [:amex-transactions])]
     [:div "This is the Amex Transactions Page."
      [transactions-table transactions]
      [nav-section]]))
 
 (defn starling-transactions-and-balances-panel []
-  (let [transactions-and-balances @(rf/subscribe [::subscriptions/starling-transactions-and-balances])]
+  (let [transactions-and-balances @(rf/subscribe [:starling-transactions-and-balances])]
     [:div "This is the Starling Transactions and Balances Page."
      [transactions-and-balances-table transactions-and-balances]
      [nav-section]]))
 
 (defn recurring-transactions-panel []
-  (let [transactions @(rf/subscribe [::subscriptions/recurring-transactions])]
+  (let [transactions @(rf/subscribe [:recurring-transactions])]
     [:div "This is the Recurring Transactions Page."
      [transactions-table transactions]
      [nav-section]]))
 
 (defn cashflow-panel []
-  (let [transactions-and-balances @(rf/subscribe [::subscriptions/cashflow-transactions-and-balances])]
+  (let [transactions-and-balances @(rf/subscribe [:cashflow-transactions-and-balances])]
     [:div "This is the Cashflow Page."
      [transactions-and-balances-table transactions-and-balances]
      [nav-section]]))
@@ -112,5 +112,5 @@
     [:div]))
 
 (defn main-panel []
-  (let [active-panel (rf/subscribe [::subscriptions/active-panel])]
+  (let [active-panel (rf/subscribe [:active-panel])]
     [panels @active-panel]))
