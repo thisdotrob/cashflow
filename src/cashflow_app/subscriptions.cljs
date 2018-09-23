@@ -134,7 +134,7 @@
         computed-balance-start-amount
         computed-balance-start-date]
        _]
-    (reduce (fn [transactions transaction
+    (reduce (fn [transactions
                  {:as transaction :keys [date]}]
               (if (>= date computed-balance-start-date)
                 (conj transactions

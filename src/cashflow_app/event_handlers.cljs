@@ -8,7 +8,6 @@
 (rf/reg-event-db
  :initialise-db
  (fn-traced [_ _]
-   (println "intialise-db event handler called")
    {:computed-balance-start-id "10ef32c6-302a-4551-b514-1c78ea2af25d"
     :amex-transactions []
     :starling-transactions-and-balances []
