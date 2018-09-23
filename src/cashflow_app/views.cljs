@@ -46,8 +46,7 @@
     [:td "Date"]
     [:td "Desc"]
     [:td "Amount"]
-    [:td "Balance"]
-    [:td "Start Transaction?"]]])
+    [:td "Balance"]]])
 
 (defn display-date [iso-string-date]
   (-> iso-string-date
@@ -61,8 +60,7 @@
    [:td (display-date date)]
    [:td narrative]
    [:td amount]
-   [:td balance]
-   [:td {:on-click #(rf/dispatch [:set-computed-balance-start-id id])} "X"]])
+   [:td balance]])
 
 (defn transactions-and-balances-table [transactions-and-balances]
   [:table {:style {:width "50%"}}

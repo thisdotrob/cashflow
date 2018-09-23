@@ -7,7 +7,13 @@
 (rf/reg-event-db
  :initialise-db
  (fn-traced [_ _]
-   {:computed-balance-start-id "10ef32c6-302a-4551-b514-1c78ea2af25d"
+   {:amex-transaction-inline-start-date "2018-08-19"
+    :adjustment-transactions [{:id "adjustment0001" ;; TODO retrieve from server, backed by csv
+                               :date "2018-08-19T23:59:00.000Z"
+                               :narrative "Amex adjustment"
+                               :amount "CHANGEME"
+                               :source "Adjustment"}]
+    :amex-repayment-inline-end-date "2018-08-02"
     :amex-transactions []
     :starling-transactions-and-balances []
     :recurring-transactions []}))

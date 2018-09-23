@@ -13,35 +13,58 @@
  (fn [db _]
    (:active-panel db)))
 
+
 (rf/reg-sub
- :amex-transactions
+ :amex-repayment-inline-end-date
+ (fn [db _]
+   (:amex-repayment-inline-end-date db)))
+
+(rf/reg-sub
+ :amex-transaction-inline-start-date
+ (fn [db _]
+   (:amex-transaction-inline-start-date db)))
+
+(rf/reg-sub
+ :amex-transactions-raw
  (fn [db _]
    (:amex-transactions db)))
 
 (rf/reg-sub
-  :amex-transactions-excluding-repayments
-  :<- [:amex-transactions]
-  (fn [amex-transactions _]
-    (filter #(-> % :narrative (not= "PAYMENT RECEIVED - THANK YOU"))
-            amex-transactions)))
+ :amex-transactions
+ :<- [:amex-transactions-raw]
+ :<- [:amex-transaction-inline-start-date]
+ (fn [[amex-transactions
+       amex-transaction-inline-start-date] _]
+   (->> amex-transactions
+        (filter #(-> (:narrative %)
+                     (not= "PAYMENT RECEIVED - THANK YOU")))
+        (filter #(-> (:date %)
+                     (subs 0 10)
+                     (>= amex-transaction-inline-start-date))))))
 
 (rf/reg-sub
- :starling-transactions-and-balances
+ :starling-transactions-raw
  (fn [db _]
    (:starling-transactions-and-balances db)))
 
 (rf/reg-sub
   :starling-transactions
-  :<- [:starling-transactions-and-balances]
-  (fn [starling-transactions-and-balances _]
-    (map #(dissoc % :balance) starling-transactions-and-balances)))
+  :<- [:amex-repayment-inline-end-date]
+  :<- [:starling-transactions-raw]
+  (fn [[amex-repayment-inline-end-date
+        starling-transactions-raw]
+       _]
+    (filter #(or (-> (:date %)
+                     (subs 0 10)
+                     (<= amex-repayment-inline-end-date))
+                 (-> (:narrative %)
+                     (not= "American Express")))
+            starling-transactions-raw)))
 
 (rf/reg-sub
-  :starling-transactions-excluding-amex-repayments
-  :<- [:starling-transactions]
-  (fn [starling-transactions _]
-    (filter #(-> % :narrative (not= "American Express"))
-            starling-transactions)))
+ :adjustment-transactions
+ (fn [db _]
+   (:adjustment-transactions db)))
 
 (rf/reg-sub
  :recurring-transactions
@@ -51,14 +74,17 @@
 (rf/reg-sub
  :all-transactions
  :<- [:recurring-transactions]
- :<- [:starling-transactions-excluding-amex-repayments]
- :<- [:amex-transactions-excluding-repayments]
+ :<- [:starling-transactions]
+ :<- [:amex-transactions]
+ :<- [:adjustment-transactions]
  (fn [[recurring-transactions
        starling-transactions
-       amex-transactions] _]
+       amex-transactions
+       adjustment-transactions] _]
    (concat recurring-transactions
            starling-transactions
-           amex-transactions)))
+           amex-transactions
+           adjustment-transactions)))
 
 (rf/reg-sub
  :all-transactions-sorted
@@ -71,78 +97,31 @@
   (fn [db _]
     (:start-date db)))
 
-(rf/reg-sub
-  :computed-balance-start-id
-  (fn [db _]
-    (:computed-balance-start-id db)))
-
-(rf/reg-sub
-  :computed-balance-start-date
-  :<- [:computed-balance-start-id]
-  :<- [:all-transactions]
-  (fn [[computed-balance-start-id all-transactions] _]
-    (:date (first (filter (fn [{:keys [id]}] (= computed-balance-start-id id))
-                          all-transactions)))))
-
-(rf/reg-sub
-  :computed-balance-start-amount
-  :<- [:computed-balance-start-id]
-  :<- [:starling-transactions-and-balances]
-  (fn [[start-id starling-transactions-and-balances] _]
-    (:balance (first (filter (fn [{:keys [id]}] (= start-id id))
-                             starling-transactions-and-balances)))))
-
-(defn new-computed-balance [prev-balance
-                            {:as transaction :keys [amount date id]}
-                            computed-balance-start-id
-                            computed-balance-start-amount
-                            computed-balance-start-date]
-  (cond
-    (= id computed-balance-start-id)      computed-balance-start-amount
-    (>= date computed-balance-start-date) (-> (+ (js/parseFloat prev-balance) (js/parseFloat amount))
-                                              (* 100)
-                                              Math/round
-                                              (/ 100)
-                                              str)
-    :else prev-balance))
+(defn balance [prev-balance transaction]
+  (if (nil? prev-balance)
+    (:balance transaction)
+    (-> (:amount transaction)
+       js/parseFloat
+       (+ (js/parseFloat prev-balance))
+       (* 100)
+       Math/round
+       (/ 100)
+       str)))
 
 (defn prev-balance [transactions]
-  (or (:balance (peek transactions)) "0"))
-
-(defn cashflow-transaction
-  [transactions
-   transaction
-   computed-balance-start-id
-   computed-balance-start-amount
-   computed-balance-start-date]
-  (assoc transaction
-         :balance
-         (new-computed-balance (prev-balance transactions)
-                               transaction
-                               computed-balance-start-id
-                               computed-balance-start-amount
-                               computed-balance-start-date)))
+  (if (> (count transactions) 0)
+    (:balance (peek transactions))
+    nil))
 
 (rf/reg-sub
   :cashflow-transactions-and-balances
   :<- [:all-transactions-sorted]
-  :<- [:computed-balance-start-id]
-  :<- [:computed-balance-start-amount]
-  :<- [:computed-balance-start-date]
-  (fn [[all-transactions-sorted
-        computed-balance-start-id
-        computed-balance-start-amount
-        computed-balance-start-date]
-       _]
-    (reduce (fn [transactions
-                 {:as transaction :keys [date]}]
-              (if (>= date computed-balance-start-date)
-                (conj transactions
-                      (cashflow-transaction transactions
-                                            transaction
-                                            computed-balance-start-id
-                                            computed-balance-start-amount
-                                            computed-balance-start-date))
-                (conj transactions transaction)))
+  (fn [all-transactions-sorted _]
+    (reduce (fn [transactions transaction]
+              (conj transactions
+                    (assoc transaction
+                           :balance
+                           (balance (prev-balance transactions)
+                                    transaction))))
             []
             all-transactions-sorted)))
