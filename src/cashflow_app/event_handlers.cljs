@@ -2,19 +2,21 @@
   (:require [re-frame.core :as rf]
             [day8.re-frame.http-fx]
             [ajax.core :as ajax]
+            [day8.re-frame.tracing :refer-macros [fn-traced]]
             [cashflow-app.stub-data :as stub-data]))
 
 (rf/reg-event-db
  :initialise-db
- (fn [_ _]
-   {:db {:computed-balance-start-id "10ef32c6-302a-4551-b514-1c78ea2af25d"
-         :amex-transactions []
-         :starling-transactions-and-balances []
-         :recurring-transactions []}}))
+ (fn-traced [_ _]
+   (println "intialise-db event handler called")
+   {:computed-balance-start-id "10ef32c6-302a-4551-b514-1c78ea2af25d"
+    :amex-transactions []
+    :starling-transactions-and-balances []
+    :recurring-transactions []}))
 
 (rf/reg-event-db
  :set-active-panel
- (fn [db [_ active-panel]]
+ (fn-traced [db [_ active-panel]]
    (assoc db :active-panel active-panel)))
 
 (def amex-transactions-data-http-opts {:method          :get
@@ -37,7 +39,7 @@
 
 (rf/reg-event-fx
  :request-active-data
- (fn [{:keys [db]} [_ data-name]]
+ (fn-traced [{:keys [db]} [_ data-name]]
    (case data-name
      :amex-transactions-data                   {:db db
                                                 :http-xhrio amex-transactions-data-http-opts}
@@ -55,15 +57,15 @@
 
 (rf/reg-event-db
   :http-fetch-success
-  (fn [db [_ db-key data]]
+  (fn-traced [db [_ db-key data]]
     (assoc db db-key data)))
 
 (rf/reg-event-db
   :http-fetch-fail
-  (fn [db [_ error-map]]
+  (fn-traced [db [_ error-map]]
     (assoc db :http-error error-map)))
 
 (rf/reg-event-db
   :set-computed-balance-start-id
-  (fn [db [_ id]]
+  (fn-traced [db [_ id]]
        (assoc db :computed-balance-start-id id)))
