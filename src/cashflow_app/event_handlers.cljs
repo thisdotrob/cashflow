@@ -8,11 +8,7 @@
  :initialise-db
  (fn-traced [_ _]
    {:amex-transaction-inline-start-date "2018-08-19"
-    :adjustment-transactions [{:id "adjustment0001" ;; TODO retrieve from server, backed by csv
-                               :date "2018-08-19T23:59:00.000Z"
-                               :narrative "Amex adjustment"
-                               :amount "CHANGEME"
-                               :source "Adjustment"}]
+    :adjustment-transactions []
     :amex-repayment-inline-end-date "2018-08-02"
     :amex-transactions []
     :starling-transactions-and-balances []
@@ -41,6 +37,12 @@
                                             :on-success      [:http-fetch-success :recurring-transactions]
                                             :on-failure      [:http-fetch-fail]})
 
+(def adjustment-transactions-data-http-opts {:method          :get
+                                            :uri             "http://localhost:3000/transactions/adjustment"
+                                            :response-format (ajax/json-response-format {:keywords? true})
+                                            :on-success      [:http-fetch-success :adjustment-transactions]
+                                            :on-failure      [:http-fetch-fail]})
+
 (rf/reg-event-fx
  :request-active-data
  (fn-traced [{:keys [db]} [_ data-name]]
@@ -53,8 +55,11 @@
                                                 :http-xhrio starling-transactions-and-balances-data-http-opts}
      :recurring-transactions-data              {:db db
                                                 :http-xhrio recurring-transactions-data-http-opts}
+     :adjustment-transactions-data             {:db db
+                                                :http-xhrio adjustment-transactions-data-http-opts}
      :cashflow-data                            {:db db
-                                                :http-xhrio [amex-transactions-data-http-opts
+                                                :http-xhrio [adjustment-transactions-data-http-opts
+                                                             amex-transactions-data-http-opts
                                                              starling-transactions-and-balances-data-http-opts
                                                              recurring-transactions-data-http-opts]}
      {:db db})))

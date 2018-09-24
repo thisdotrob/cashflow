@@ -25,4 +25,6 @@
               (get-in initialized-routes [:transactions :amex]))
         (.get "/transactions/recurring"
               (get-in initialized-routes [:transactions :recurring]))
+        (.get "/transactions/adjustment"
+              (get-in initialized-routes [:transactions :adjustment]))
         (.use error-handler))))
