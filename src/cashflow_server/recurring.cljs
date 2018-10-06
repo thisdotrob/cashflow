@@ -11,7 +11,7 @@
     (range 1 11)
     (range 0 10)))
 
-(defn future-transaction [today recurring-transaction months-to-add]
+(defn future-monthly-transaction [today recurring-transaction months-to-add]
   (let [{:keys [narrative amount day]} recurring-transaction
         date (-> today
                  (date/add-months months-to-add)
@@ -24,8 +24,8 @@
      :date date
      :id id}))
 
-(defn future-transactions [today transaction]
-  (map #(future-transaction today transaction %)
+(defn future-monthly-transactions [today transaction]
+  (map #(future-monthly-transaction today transaction %)
        (range-months-to-add transaction today)))
 
 (defn json->clj [json]
@@ -37,13 +37,44 @@
 (defn monthly-transactions [recurring-transactions]
   (->> recurring-transactions
        (filter #(= "monthly" (:frequency %)))
-       (map #(future-transactions (date/today) %))
+       (map #(future-monthly-transactions (date/today) %))
+       flatten))
+
+(def num-future-weekly-transactions 40)
+
+(defn future-weekly-transaction-dates [start-date
+                                       num-future-weekly-transactions]
+  (map #(date/add-weeks start-date %)
+       (range 0 num-future-weekly-transactions)))
+
+(defn future-weekly-transaction [transaction date]
+  (let [{:keys [narrative amount day]} transaction
+        id (str narrative amount day date)]
+    {:source "Recurring"
+    :narrative narrative
+    :amount amount
+    :date date
+    :id id}))
+
+(defn future-weekly-transactions [transaction]
+  (let [day-of-week (:day transaction)
+        start-date (date/next-day-of-week day-of-week)
+        transaction-dates (future-weekly-transaction-dates start-date
+                                                           num-future-weekly-transactions)]
+    (map #(future-weekly-transaction transaction %) transaction-dates)))
+
+(defn weekly-transactions [recurring-transactions]
+  (->> recurring-transactions
+       (filter #(= "weekly" (:frequency %)))
+       (map #(future-weekly-transactions %))
        flatten))
 
 (defn transactions [{:keys [RECURRING_TRANSACTIONS_FILENAME]}]
-  (go (->> RECURRING_TRANSACTIONS_FILENAME
-           read-file-async
-           <!
-           json->clj
-           monthly-transactions
-           (sort-by :date))))
+  (go (let [recurring-transactions (->> RECURRING_TRANSACTIONS_FILENAME
+                                        read-file-async
+                                        <!
+                                        json->clj
+                                        (sort-by :date))
+            monthly-transactions (monthly-transactions recurring-transactions)
+            weekly-transactions (weekly-transactions recurring-transactions)]
+        (sort-by :date (concat weekly-transactions monthly-transactions)))))
