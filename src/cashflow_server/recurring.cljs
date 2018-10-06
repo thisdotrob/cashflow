@@ -34,11 +34,16 @@
 (defn read-file-async [filename]
   (utils/js-invoke-async fs "readFile" filename "utf8"))
 
+(defn monthly-transactions [recurring-transactions]
+  (->> recurring-transactions
+       (filter #(= "monthly" (:frequency %)))
+       (map #(future-transactions (date/today) %))
+       flatten))
+
 (defn transactions [{:keys [RECURRING_TRANSACTIONS_FILENAME]}]
   (go (->> RECURRING_TRANSACTIONS_FILENAME
            read-file-async
            <!
            json->clj
-           (map #(future-transactions (date/today) %))
-           flatten
+           monthly-transactions
            (sort-by :date))))
