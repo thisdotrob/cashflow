@@ -20,15 +20,15 @@
 (def transactions-header
   [:thead
    [:tr
-    [:td "Source"]
     [:td "Date"]
+    [:td "Source"]
     [:td "Desc"]
     [:td "Amount"]]])
 
 (defn transactions-row [{:as data :keys [source id date narrative amount]}]
   [:tr
-   [:td source]
    [:td date]
+   [:td source]
    [:td narrative]
    [:td amount]])
 
@@ -42,8 +42,8 @@
 (def transactions-and-balances-header
   [:thead
    [:tr
-    [:td "Source"]
     [:td "Date"]
+    [:td "Source"]
     [:td "Desc"]
     [:td "Amount"]
     [:td "Balance"]]])
@@ -56,8 +56,8 @@
 
 (defn transactions-and-balances-row [{:as data :keys [source id date narrative amount balance]}]
   [:tr
-   [:td source]
    [:td (display-date date)]
+   [:td source]
    [:td narrative]
    [:td amount]
    [:td balance]])
