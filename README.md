@@ -17,4 +17,5 @@ Next enter `npm run server-watch` until you see "Build completed."
 
 Next run `npm run server-start` in a separate terminal. The server will now be listening on port 3000.
 
-Next run `npm run app-watch` in a seperate terminal. Once you see "Build completed." you can load the app at `http://localhost:8020`.
+Next run `npm run app-watch` in a seperate terminal. Once you see "Build completed." you can load the
+app at `http://localhost:8020`.
