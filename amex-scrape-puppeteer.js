@@ -16,7 +16,6 @@ const main = async () => {
   console.log("Logging in...");
   await page.type("input[name=UserID]", process.env.AMEX_USERNAME);
   await page.type("input[name=Password]", process.env.AMEX_PASSWORD);
-  await page.click("#login-submit");
   await Promise.all([page.waitForNavigation(), page.click("#login-submit")]);
 
   console.log("Visiting export statement data page...");
@@ -29,11 +28,8 @@ const main = async () => {
 
   console.log("Selecting all statement data...");
   await page.click("#CSV");
-  await page.click("#selectCard10");
-  await page.click("#radioid00");
-  await page.click("#radioid01");
-  await page.click("#radioid02");
-  await page.click("#radioid03");
+  await page.click("#selectCard11");
+  await page.click("#radioid10");
   await page._client.send("Page.setDownloadBehavior", {
     behavior: "allow",
     downloadPath: process.env.AMEX_TRANSACTIONS_PATH
