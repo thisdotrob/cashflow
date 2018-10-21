@@ -6,5 +6,6 @@ out
 ofx.csv
 recurring.json
 adjustments.json
+one_off.json
 .*.swp
 public/js
