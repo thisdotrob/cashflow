@@ -19,3 +19,7 @@ Next run `npm run server-start` in a separate terminal. The server will now be l
 
 Next run `npm run app-watch` in a seperate terminal. Once you see "Build completed." you can load the
 app at `http://localhost:8020`.
+
+# TODO:
+Recurring transactions starting after date X.
+One off transactions.
