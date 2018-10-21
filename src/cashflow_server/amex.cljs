@@ -2,16 +2,17 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require ["fs" :as fs]
             [goog.labs.format.csv :as csv]
+            [goog.string :as gstring]
+            goog.string.format
             [cljs.core.async :refer [<!]]
             [clojure.string :as string]
             [cashflow-server.utils :as utils]))
 
 (defn amex-amount->amount [amount]
-  (-> amount
+  (->> amount
       string/trim
-      int
-      (* -1)
-      str))
+      (gstring/format "%.2f")
+      (str "-")))
 
 (defn amex-reference->id [reference]
   (subs reference 11))
