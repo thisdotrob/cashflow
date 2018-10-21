@@ -7,9 +7,9 @@
 (rf/reg-event-db
  :initialise-db
  (fn-traced [_ _]
-   {:amex-transaction-inline-start-date "2018-08-19"
+   {:amex-transaction-inline-start-date "2018-10-10"
     :adjustment-transactions []
-    :amex-repayment-inline-end-date "2018-08-02"
+    :amex-repayment-inline-end-date "2018-10-16"
     :amex-transactions []
     :starling-transactions-and-balances []
     :recurring-transactions []}))
