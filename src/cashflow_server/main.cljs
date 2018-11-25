@@ -5,15 +5,13 @@
 (defn listening-msg [port]
   (str "cashflow-server listening on port " port))
 
-(defn start-server [{:keys [PORT] :as env-vars}]
-  (-> env-vars
-      (app/create-app)
-      (.listen PORT (println (listening-msg PORT)))))
+(defn start-server [env-vars]
+  (-> (app/create-app env-vars)
+      (.listen 3000 #(println (listening-msg 3000)))))
 
 (defonce server (atom nil))
 
-(def env-keys [:STARLING_HOST
-               :STARLING_TOKEN])
+(def env-keys [:STARLING_HOST :STARLING_TOKEN])
 
 (defn start! []
   (->> env-keys

@@ -2,16 +2,30 @@ To start developing, install the dependencies with `npm i`, then start a
 shadow-cljs server process with `npm run shadow-start`.
 
 The following environment variables must be set:
-- PORT
 - STARLING_HOST
 - STARLING_TOKEN
-- RECURRING_TRANSACTIONS_FILENAME
-- AMEX_TRANSACTIONS_FILENAME
-- AMEX_TRANSACTIONS_PATH
 - AMEX_USERNAME
 - AMEX_PASSWORD
 
 First scrape the amex transactions using `npm run amex-scrape` until you see "Finished!".
+
+Save a list of recurring transactions in the following format in `recurring.json`.
+```
+[
+  {
+    "narrative": "Eating out",
+    "amount": "-80",
+    "day": "7",
+    "frequency": "weekly"
+  },
+  {
+    "narrative": "Child care",
+    "amount": "-38.33",
+    "day": "22",
+    "frequency": "monthly"
+  }
+]
+```
 
 Next enter `npm run server-watch` until you see "Build completed."
 
