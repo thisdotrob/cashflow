@@ -3,9 +3,10 @@ node_modules
 .nrepl-port
 out
 .env
-ofx.csv
+amex.csv
 recurring.json
 adjustments.json
 one_off.json
 .*.swp
 public/js
+screenshot*

@@ -69,8 +69,8 @@
        (map #(future-weekly-transactions %))
        flatten))
 
-(defn transactions [{:keys [RECURRING_TRANSACTIONS_FILENAME]}]
-  (go (let [recurring-transactions (->> RECURRING_TRANSACTIONS_FILENAME
+(defn transactions [_]
+  (go (let [recurring-transactions (->> "recurring.json"
                                         read-file-async
                                         <!
                                         json->clj

@@ -16,8 +16,8 @@
 (defn assoc-source [transaction]
   (assoc transaction :source "Adjustment"))
 
-(defn transactions [{:keys [ADJUSTMENT_TRANSACTIONS_FILENAME]}]
-  (go (->> ADJUSTMENT_TRANSACTIONS_FILENAME
+(defn transactions [_]
+  (go (->> "adjustments.json"
            read-file-async
            <!
            json->clj

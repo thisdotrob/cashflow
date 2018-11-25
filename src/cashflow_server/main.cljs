@@ -12,13 +12,8 @@
 
 (defonce server (atom nil))
 
-(def env-keys [:PORT
-               :STARLING_HOST
-               :STARLING_TOKEN
-               :RECURRING_TRANSACTIONS_FILENAME
-               :ADJUSTMENT_TRANSACTIONS_FILENAME
-               :AMEX_TRANSACTIONS_FILENAME
-               :AMEX_TRANSACTIONS_PATH])
+(def env-keys [:STARLING_HOST
+               :STARLING_TOKEN])
 
 (defn start! []
   (->> env-keys
