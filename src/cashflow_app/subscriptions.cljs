@@ -24,12 +24,13 @@
 (rf/reg-sub
   :starling-transactions
   (fn [db _]
-    (filter #(or (-> (:date %)
-                     (subs 0 10)
-                     (<= (:amex-repayment-inline-end-date db)))
-                 (-> (:narrative %)
-                     (not= "American Express")))
-            (:starling-transactions-and-balances db))))
+    (sort-by :date
+             (filter #(or (-> (:date %)
+                              (subs 0 10)
+                              (<= (:amex-repayment-inline-end-date db)))
+                          (-> (:narrative %)
+                              (not= "American Express")))
+                     (:starling-transactions-and-balances db)))))
 
 (rf/reg-sub
  :adjustment-transactions
