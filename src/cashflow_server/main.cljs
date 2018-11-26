@@ -11,7 +11,7 @@
 
 (defonce server (atom nil))
 
-(def env-keys [:STARLING_HOST :STARLING_TOKEN])
+(def env-keys [:STARLING_TOKEN])
 
 (defn start! []
   (->> env-keys
