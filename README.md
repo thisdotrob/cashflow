@@ -27,6 +27,11 @@ Save a list of recurring transactions in the following format in `recurring.json
 ]
 ```
 
+Save a list of adjustment transactions in the following format in `adjustments.json`.
+```
+[]
+```
+
 Next enter `npm run server-watch` until you see "Build completed."
 
 Next run `npm run server-start` in a separate terminal. The server will now be listening on port 3000.
