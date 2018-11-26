@@ -2,7 +2,6 @@ To start developing, install the dependencies with `npm i`, then start a
 shadow-cljs server process with `npm run shadow-start`.
 
 The following environment variables must be set:
-- STARLING_HOST
 - STARLING_TOKEN
 - AMEX_USERNAME
 - AMEX_PASSWORD

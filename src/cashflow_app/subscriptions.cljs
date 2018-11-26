@@ -16,9 +16,10 @@
 (rf/reg-sub
  :amex-transactions
  (fn [db _]
-   (filter #(-> (:narrative %)
-                (not= "PAYMENT RECEIVED - THANK YOU"))
-           (:amex-transactions db))))
+   (sort-by :date
+            (filter #(-> (:narrative %)
+                         (not= "PAYMENT RECEIVED - THANK YOU"))
+                    (:amex-transactions db)))))
 
 (rf/reg-sub
   :starling-transactions

@@ -15,9 +15,9 @@
    :amount (gstring/format "%.2f" (get transaction "amount"))
    :balance (gstring/format "%.2f" (get transaction "balance"))})
 
-(defn transactions-and-balances [{:keys [STARLING_HOST STARLING_TOKEN]}]
+(defn transactions-and-balances [{:keys [STARLING_TOKEN]}]
   (go
-    (->> {:hostname STARLING_HOST
+    (->> {:hostname "api.starlingbank.com"
           :path "/api/v1/transactions"
           :headers {:Authorization (str "Bearer " STARLING_TOKEN)}}
          utils/https-get-async
