@@ -13,53 +13,22 @@
  (fn [db _]
    (:active-panel db)))
 
-
-(rf/reg-sub
- :amex-repayment-inline-end-date
- (fn [db _]
-   (:amex-repayment-inline-end-date db)))
-
-(rf/reg-sub
- :amex-transaction-inline-start-date
- (fn [db _]
-   (:amex-transaction-inline-start-date db)))
-
-(rf/reg-sub
- :amex-transactions-raw
- (fn [db _]
-   (:amex-transactions db)))
-
 (rf/reg-sub
  :amex-transactions
- :<- [:amex-transactions-raw]
- :<- [:amex-transaction-inline-start-date]
- (fn [[amex-transactions
-       amex-transaction-inline-start-date] _]
-   (->> amex-transactions
-        (filter #(-> (:narrative %)
-                     (not= "PAYMENT RECEIVED - THANK YOU")))
-        (filter #(-> (:date %)
-                     (subs 0 10)
-                     (>= amex-transaction-inline-start-date))))))
-
-(rf/reg-sub
- :starling-transactions-raw
  (fn [db _]
-   (:starling-transactions-and-balances db)))
+   (filter #(-> (:narrative %)
+                (not= "PAYMENT RECEIVED - THANK YOU"))
+           (:amex-transactions db))))
 
 (rf/reg-sub
   :starling-transactions
-  :<- [:amex-repayment-inline-end-date]
-  :<- [:starling-transactions-raw]
-  (fn [[amex-repayment-inline-end-date
-        starling-transactions-raw]
-       _]
+  (fn [db _]
     (filter #(or (-> (:date %)
                      (subs 0 10)
-                     (<= amex-repayment-inline-end-date))
+                     (<= (:amex-repayment-inline-end-date db)))
                  (-> (:narrative %)
                      (not= "American Express")))
-            starling-transactions-raw)))
+            (:starling-transactions-and-balances db))))
 
 (rf/reg-sub
  :adjustment-transactions
@@ -81,16 +50,11 @@
        starling-transactions
        amex-transactions
        adjustment-transactions] _]
-   (concat recurring-transactions
-           starling-transactions
-           amex-transactions
-           adjustment-transactions)))
-
-(rf/reg-sub
- :all-transactions-sorted
- :<- [:all-transactions]
- (fn [all-transactions _]
-   (sort-by :date all-transactions)))
+   (sort-by :date
+            (concat recurring-transactions
+                    starling-transactions
+                    amex-transactions
+                    adjustment-transactions))))
 
 (rf/reg-sub
   :start-date
@@ -115,13 +79,13 @@
 
 (rf/reg-sub
   :cashflow-transactions-and-balances
-  :<- [:all-transactions-sorted]
-  (fn [all-transactions-sorted _]
-    (reduce (fn [transactions transaction]
-              (conj transactions
+  :<- [:all-transactions]
+  (fn [all-transactions _]
+    (reduce (fn [acc transaction]
+              (conj acc
                     (assoc transaction
                            :balance
-                           (balance (prev-balance transactions)
+                           (balance (prev-balance acc)
                                     transaction))))
             []
-            all-transactions-sorted)))
+            all-transactions)))

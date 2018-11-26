@@ -7,11 +7,16 @@
 (defn nav-section []
   [:div
    [:ul
-    [:li [:a {:href (routes/url-for :starling-transactions-and-balances)} "starling transactions and balances"]]
-    [:li [:a {:href (routes/url-for :amex-transactions)} "amex transactions"]]
-    [:li [:a {:href (routes/url-for :starling-transactions)} "starling transactions"]]
-    [:li [:a {:href (routes/url-for :recurring-transactions)} "recurring transactions"]]
-    [:li [:a {:href (routes/url-for :cashflow)} "cashflow"]]]])
+    [:li
+     [:a {:href (routes/url-for :amex-transactions)} "amex"]]
+    [:li
+     [:a {:href (routes/url-for :starling-transactions)} "starling"]]
+    [:li
+     [:a {:href (routes/url-for :recurring-transactions)} "recurring"]]
+    [:li
+     [:a {:href (routes/url-for :adjustment-transactions)} "adjustment"]]
+    [:li
+     [:a {:href (routes/url-for :cashflow)} "all"]]]])
 
 (defn home-panel []
   [:div (str "This is the Home Page.")
@@ -93,6 +98,12 @@
      [transactions-table transactions]
      [nav-section]]))
 
+(defn adjustment-transactions-panel []
+  (let [transactions @(rf/subscribe [:adjustment-transactions])]
+    [:div "This is the Adjustment Transactions Page."
+     [transactions-table transactions]
+     [nav-section]]))
+
 (defn cashflow-panel []
   (let [transactions-and-balances @(rf/subscribe [:cashflow-transactions-and-balances])]
     [:div "This is the Cashflow Page."
@@ -105,8 +116,8 @@
     :cashflow-panel [cashflow-panel]
     :amex-transactions-panel [amex-transactions-panel]
     :starling-transactions-panel [starling-transactions-panel]
-    :starling-transactions-and-balances-panel [starling-transactions-and-balances-panel]
     :recurring-transactions-panel [recurring-transactions-panel]
+    :adjustment-transactions-panel [adjustment-transactions-panel]
     [:div]))
 
 (defn main-panel []
