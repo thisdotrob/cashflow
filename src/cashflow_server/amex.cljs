@@ -11,8 +11,9 @@
 (defn amex-amount->amount [amount]
   (->> amount
       string/trim
-      (gstring/format "%.2f")
-      (str "-")))
+      (js/parseFloat)
+      (* -1)
+      (gstring/format "%.2f")))
 
 (defn amex-reference->id [reference]
   (subs reference 11))

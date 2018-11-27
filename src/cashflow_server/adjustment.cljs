@@ -22,5 +22,6 @@
            <!
            json->clj
            (map assoc-id)
-           (map assoc-source))))
+           (map assoc-source)
+           (sort-by :date))))
 

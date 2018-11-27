@@ -6,10 +6,13 @@
             [cashflow-server.date :as date]
             [cashflow-server.utils :as utils]))
 
+(def NUM-FUTURE-WEEKLY-TRANSACTIONS 40)
+(def NUM-FUTURE-MONTHLY-TRANSACTIONS 10)
+
 (defn range-months-to-add [transaction today]
   (if (< (:day transaction) (date/get-day today))
-    (range 1 11)
-    (range 0 10)))
+    (range 1 (+ 1 NUM-FUTURE-MONTHLY-TRANSACTIONS))
+    (range 0 (NUM-FUTURE-MONTHLY-TRANSACTIONS))))
 
 (defn future-monthly-transaction [today recurring-transaction months-to-add]
   (let [{:keys [narrative amount day]} recurring-transaction
@@ -40,12 +43,9 @@
        (map #(future-monthly-transactions (date/today) %))
        flatten))
 
-(def num-future-weekly-transactions 40)
-
-(defn future-weekly-transaction-dates [start-date
-                                       num-future-weekly-transactions]
-  (map #(date/add-weeks start-date %)
-       (range 0 num-future-weekly-transactions)))
+(defn future-weekly-transaction-dates [start-date]
+  (map #(str (date/add-weeks start-date %) "T23:59:59.999Z")
+       (range 0 NUM-FUTURE-WEEKLY-TRANSACTIONS)))
 
 (defn future-weekly-transaction [transaction date]
   (let [{:keys [narrative amount day]} transaction
@@ -59,8 +59,7 @@
 (defn future-weekly-transactions [transaction]
   (let [day-of-week (:day transaction)
         start-date (date/next-day-of-week day-of-week)
-        transaction-dates (future-weekly-transaction-dates start-date
-                                                           num-future-weekly-transactions)]
+        transaction-dates (future-weekly-transaction-dates start-date)]
     (map #(future-weekly-transaction transaction %) transaction-dates)))
 
 (defn weekly-transactions [recurring-transactions]
