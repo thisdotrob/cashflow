@@ -15,4 +15,5 @@
                   :recurring  (route env-vars recurring/transactions)}
    :transactions-and-balances {:starling
                                (route env-vars
-                                      starling/transactions-and-balances)}})
+                                      starling/transactions-and-balances)}
+   :savings-goals {:starling (route env-vars starling/savings-goals)}})
