@@ -28,7 +28,13 @@ Save a list of recurring transactions in the following format in `recurring.json
 
 Save a list of adjustment transactions in the following format in `adjustments.json`.
 ```
-[]
+[
+  {
+    "narrative": "adjustment 0",
+    "amount": "-100.99",
+    "date": "2018-11-25"
+  }
+]
 ```
 
 Next enter `npm run server-watch` until you see "Build completed."
