@@ -2,10 +2,11 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [goog.string :as gstring]
             goog.string.format
-            [cashflow-server.utils :as utils]
             [cljs.core.async :as async :refer [<!]]
             [clojure.string :as string]
-            ["fs" :as fs]))
+            ["fs" :as fs]
+            [cashflow-server.date :as date]
+            [cashflow-server.utils :as utils]))
 
 (defn starling-transaction->transaction-and-balance [transaction]
   {:source "Starling"
@@ -71,6 +72,34 @@
           starling-recurring-transfer->recurring-transfer
           (assoc savings-goal :recurring-transfer)))))
 
+(defn recurrence-rule->payment-dates
+  [{:keys [count frequency interval start-date]}]
+  (let [add-fn (if (= "MONTHLY" frequency)
+                 date/add-months
+                 date/add-weeks)
+        intervals (map #(* interval %) (range 0 count))]
+    (map #(str (add-fn start-date %))
+         intervals)))
+
+(defn savings-goal->future-transactions
+  [{:keys [recurring-transfer name target]}]
+  (let [instalment-amount (/ (/ target
+                                (get-in recurring-transfer
+                                        [:recurrence-rule
+                                         :count]))
+                             100)
+        future-transaction (fn [date] {:source "Starling"
+                                       :narrative name
+                                       :amount instalment-amount
+                                       :date date
+                                       :id (str name
+                                                instalment-amount
+                                                date)})]
+    (->> recurring-transfer
+         :recurrence-rule
+         recurrence-rule->payment-dates
+         (map future-transaction))))
+
 (defn savings-goals [{:keys [STARLING_TOKEN]}]
   (go
     (->> {:hostname "api.starlingbank.com"
@@ -86,3 +115,8 @@
          async/merge
          (async/into [])
          <!)))
+
+(defn future-transactions [env-vars]
+  (go (->> (savings-goals env-vars)
+           <!
+           (map savings-goal->future-transactions))))

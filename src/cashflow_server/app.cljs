@@ -27,6 +27,6 @@
               (get-in initialized-routes [:transactions :recurring]))
         (.get "/transactions/adjustment"
               (get-in initialized-routes [:transactions :adjustment]))
-        (.get "/savings-goals/starling"
-              (get-in initialized-routes [:savings-goals :starling]))
+        (.get "/transactions/starling-future"
+              (get-in initialized-routes [:transactions :starling-future]))
         (.use error-handler))))

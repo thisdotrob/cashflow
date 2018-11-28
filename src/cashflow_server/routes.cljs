@@ -12,8 +12,8 @@
 (defn initialize [env-vars]
   {:transactions {:adjustment (route env-vars adjustment/transactions)
                   :amex       (route env-vars amex/transactions)
-                  :recurring  (route env-vars recurring/transactions)}
+                  :recurring  (route env-vars recurring/transactions)
+                  :starling-future (route env-vars starling/future-transactions)}
    :transactions-and-balances {:starling
                                (route env-vars
-                                      starling/transactions-and-balances)}
-   :savings-goals {:starling (route env-vars starling/savings-goals)}})
+                                      starling/transactions-and-balances)}})
