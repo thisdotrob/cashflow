@@ -8,110 +8,27 @@
             [cashflow-server.date :as date]
             [cashflow-server.utils :as utils]))
 
-(defn starling-transaction->transaction-and-balance [transaction]
-  {:source "Starling"
-   :id (get transaction "id")
-   :date (get transaction "created")
-   :narrative (get transaction "narrative")
-   :amount (gstring/format "%.2f" (get transaction "amount"))
-   :balance (gstring/format "%.2f" (get transaction "balance"))})
+(defn savings-goal->recurrence-rule [savings-goal]
+  (let [recurring-transfer (get savings-goal "recurringTransfer")
+        recurrence-rule (get recurring-transfer "recurrenceRule")]
+    {:start-date (get recurrence-rule "startDate")
+     :frequency (get recurrence-rule "frequency")
+     :interval (get recurrence-rule "interval")
+     :count (get recurrence-rule "count")
+     :amount (/ (get-in recurring-transfer ["currencyAndAmount" "minorUnits"])
+                -100)
+     :narrative (get savings-goal "name")}))
 
-(defn starling-savings-goal->savings-goal [savings-goal]
-  {:uid (get savings-goal "uid")
-   :name (get savings-goal "name")
-   :target (get-in savings-goal ["target" "minorUnits"])
-   :total-saved (get-in savings-goal ["totalSaved" "minorUnits"])})
+(defn scheduled-payment->recurrence-rule [scheduled-payment]
+  (let [recurrence-rule (get scheduled-payment "recurrenceRule")]
+    {:start-date (get recurrence-rule "startDate")
+    :frequency (get recurrence-rule "frequency")
+    :interval (get recurrence-rule "interval")
+    :count (get recurrence-rule "count")
+    :amount (* -1 (get scheduled-payment "amount"))
+    :narrative (get scheduled-payment "reference")}))
 
-(defn starling-recurring-transfer->recurring-transfer [transfer]
-  {:transfer-uid (get transfer "transferUid")
-   :recurrence-rule {:start-date (get-in transfer
-                                         ["recurrenceRule" "startDate"])
-                     :frequency (get-in transfer
-                                        ["recurrenceRule" "frequency"])
-                     :interval (get-in transfer
-                                        ["recurrenceRule" "interval"])
-                     :count (get-in transfer
-                                        ["recurrenceRule" "count"])
-                     :until-date (get-in transfer
-                                        ["recurrenceRule" "untilDate"])
-                     :week-start (get-in transfer
-                                        ["recurrenceRule" "weekStart"])
-                     :days (get-in transfer
-                                        ["recurrenceRule" "days"])
-                     :month-day (get-in transfer
-                                        ["recurrenceRule" "monthDay"])
-                     :month-week (get-in transfer
-                                        ["recurrenceRule" "monthWeek"])}
-   :amount (get-in transfer ["currencyAndAmount" "minorUnits"])})
-
-(defn assoc-recurring-transfer [token savings-goal]
-  (go
-    (if (= (:total-saved savings-goal) (:target savings-goal))
-      savings-goal ;; return unmodified since making a request will 404
-      (->> {:hostname "api.starlingbank.com"
-           :path (str "/api/v1/savings-goals/"
-                      (:uid savings-goal)
-                      "/recurring-transfer")
-           :headers {:Authorization (str "Bearer " token)}}
-          utils/https-get-async
-          <!
-          (.parse js/JSON)
-          js->clj
-          starling-recurring-transfer->recurring-transfer
-          (assoc savings-goal :recurring-transfer)))))
-
-(defn recurrence-rule->payment-dates
-  [{:keys [count frequency interval start-date]}]
-  (let [add-fn (if (= "MONTHLY" frequency)
-                 date/add-months
-                 date/add-weeks)
-        intervals (map #(* interval %) (range 0 count))]
-    (map #(str (add-fn start-date %))
-         intervals)))
-
-(defn transaction [narrative amount date]
-  {:source "Starling"
-   :narrative narrative
-   :amount amount
-   :date (str date "T23:59:59.999Z")
-   :id (str narrative
-            amount
-            date)})
-
-(defn savings-goal->future-transactions
-  [{:keys [recurring-transfer name target]}]
-  (let [instalment-amount (/ (/ target
-                                (get-in recurring-transfer
-                                        [:recurrence-rule
-                                         :count]))
-                             -100)]
-    (->> recurring-transfer
-         :recurrence-rule
-         recurrence-rule->payment-dates
-         (map (partial transaction name instalment-amount)))))
-
-(defn savings-goals [{:keys [STARLING_TOKEN]}]
-  (go
-    (->> {:hostname "api.starlingbank.com"
-          :path "/api/v1/savings-goals"
-          :headers {:Authorization (str "Bearer " STARLING_TOKEN)}}
-         utils/https-get-async
-         <!
-         (.parse js/JSON)
-         js->clj
-         (#(get % "savingsGoalList"))
-         (map starling-savings-goal->savings-goal)
-         (map (partial assoc-recurring-transfer STARLING_TOKEN))
-         async/merge
-         (async/into [])
-         <!)))
-
-(defn future-transactions [env-vars]
-  (go (->> (savings-goals env-vars)
-           <!
-           (mapcat savings-goal->future-transactions))))
-
-(defn past-transactions [{:keys [STARLING_TOKEN]}]
+(defn fetch-past-transactions [{:keys [STARLING_TOKEN]}]
   (go
     (->> {:hostname "api.starlingbank.com"
           :path "/api/v1/transactions"
@@ -120,42 +37,103 @@
          <!
          (.parse js/JSON)
          js->clj
-         (#(get-in % ["_embedded" "transactions"]))
-         (map starling-transaction->transaction-and-balance))))
+         (#(get-in % ["_embedded" "transactions"])))))
 
-(defn starling-scheduled-payment->scheduled-payment [payment]
-  {:next-date (get payment "nextDate")
-   :amount (get payment "amount")
-   :reference (get payment "reference")
-   :payment-type (get payment "paymentType")
-   :recurrence-rule {:start-date (get-in payment ["recurrenceRule" "startDate"])
-                     :interval (get-in payment ["recurrenceRule" "interval"])
-                     :count (get-in payment ["recurrenceRule" "count"])
-                     :frequency (get-in payment ["recurrenceRule" "frequency"])}})
-
-
-(defn scheduled-payment->future-transactions
-  [{:keys [amount reference recurrence-rule] :as x}]
-  (if (nil? (:count recurrence-rule))
-    (->> recurrence-rule
-          recurrence-rule->payment-dates
-          (map (partial transaction (str reference "one-off") amount)))
-    (if (= 1 (:count recurrence-rule))
-     [(transaction reference amount (:start-date recurrence-rule))]
-     (->> recurrence-rule
-          recurrence-rule->payment-dates
-          (map (partial transaction reference amount))))))
-
-(defn scheduled-payments [{:keys [STARLING_TOKEN nilkey]}]
+(defn fetch-recurring-transfer [token savings-goal]
   (go
     (->> {:hostname "api.starlingbank.com"
-          :path "/api/v1/payments/scheduled"
-          :headers {:Authorization (str "Bearer " STARLING_TOKEN)}}
+          :path (str "/api/v1/savings-goals/"
+                     (get savings-goal "uid")
+                     "/recurring-transfer")
+          :headers {:Authorization (str "Bearer " token)}}
          utils/https-get-async
          <!
          (.parse js/JSON)
-         js->clj
-         (#(get-in % ["_embedded" "paymentOrders"]))
-         (filter #(> (get % "nextDate") (date/today)))
-         (map starling-scheduled-payment->scheduled-payment)
-         (mapcat scheduled-payment->future-transactions))))
+         js->clj)))
+
+(defn fetch-savings-goals [{:keys [STARLING_TOKEN]}]
+  (go
+    (let [finished? #(= (get-in % ["totalSaved" "minorUnits"])
+                        (get-in % ["target" "minorUnits"]))]
+      (->> {:hostname "api.starlingbank.com"
+            :path "/api/v1/savings-goals"
+            :headers {:Authorization (str "Bearer " STARLING_TOKEN)}}
+           utils/https-get-async
+           <!
+           (.parse js/JSON)
+           js->clj
+           (#(get % "savingsGoalList"))
+           (filter (complement finished?))
+           (map #(go (->> (fetch-recurring-transfer STARLING_TOKEN %)
+                          <!
+                          (assoc % "recurringTransfer"))))
+           async/merge
+           (async/into [])
+           <!))))
+
+(defn fetch-scheduled-payments [{:keys [STARLING_TOKEN nilkey]}]
+  (go
+    (let [in-future? #(> (get % "nextDate")
+                         (date/today))]
+      (->> {:hostname "api.starlingbank.com"
+            :path "/api/v1/payments/scheduled"
+            :headers {:Authorization (str "Bearer " STARLING_TOKEN)}}
+           utils/https-get-async
+           <!
+           (.parse js/JSON)
+           js->clj
+           (#(get-in % ["_embedded" "paymentOrders"]))
+           (filter in-future?)))))
+
+(defn recurrence-rule->payment-dates
+  [{:keys [count frequency interval start-date] :as recurrence-rule}]
+  (let [one-off-payment? (and (= 1 count)
+                              (nil? frequency)
+                              (nil? interval))
+        add-fn (if (= "MONTHLY" frequency)
+                 date/add-months
+                 date/add-weeks)]
+    (if one-off-payment?
+      [start-date]
+      (->> (range 0 count)
+           (map #(* interval %))
+           (map #(str (add-fn start-date %)))))))
+
+(defn recurrence-rule->future-transactions
+  [{:keys [amount narrative] :as recurrence-rule}]
+  (->> recurrence-rule
+       recurrence-rule->payment-dates
+       (map (fn [date]
+              {:source "Starling"
+               :narrative narrative
+               :amount amount
+               :date (str date "T23:59:59.999Z")
+               :id (str narrative
+                        amount
+                        date)}))))
+
+(defn future-transactions [env-vars]
+  (go
+    (let [recurrence-rules
+          (concat (map savings-goal->recurrence-rule
+                       (<! (fetch-savings-goals env-vars)))
+                  (map scheduled-payment->recurrence-rule
+                       (<! (fetch-scheduled-payments env-vars))))]
+      (mapcat recurrence-rule->future-transactions recurrence-rules))))
+
+(defn past-transactions [env-vars]
+  (go
+    (->> (fetch-past-transactions env-vars)
+         <!
+         (map (fn [obj]
+                {:source "Starling"
+                 :id (get obj "id")
+                 :date (get obj "created")
+                 :narrative (get obj "narrative")
+                 :amount (gstring/format "%.2f" (get obj "amount"))
+                 :balance (gstring/format "%.2f" (get obj "balance"))})))))
+
+(defn transactions [env-vars]
+  (go
+    (concat (<! (past-transactions env-vars))
+            (<! (future-transactions env-vars)))))

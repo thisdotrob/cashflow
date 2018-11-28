@@ -19,6 +19,8 @@
   (let [initialized-routes (routes/initialize env-vars)]
     (-> (express)
         (.use cors-handler)
+        (.get "/transactions/starling"
+              (get-in initialized-routes [:transactions :starling]))
         (.get "/transactions/past/adjustment"
               (get-in initialized-routes [:transactions :past :adjustment]))
         (.get "/transactions/past/amex"
@@ -29,6 +31,4 @@
               (get-in initialized-routes [:transactions :future :starling]))
         (.get "/transactions/future/recurring"
               (get-in initialized-routes [:transactions :future :recurring]))
-        (.get "/starling-scheduled-payments"
-              (get-in initialized-routes [:starling-scheduled-payments]))
         (.use error-handler))))
