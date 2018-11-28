@@ -44,18 +44,6 @@
                                         ["recurrenceRule" "monthWeek"])}
    :amount (get-in transfer ["currencyAndAmount" "minorUnits"])})
 
-(defn transactions-and-balances [{:keys [STARLING_TOKEN]}]
-  (go
-    (->> {:hostname "api.starlingbank.com"
-          :path "/api/v1/transactions"
-          :headers {:Authorization (str "Bearer " STARLING_TOKEN)}}
-         utils/https-get-async
-         <!
-         (.parse js/JSON)
-         js->clj
-         (#(get-in % ["_embedded" "transactions"]))
-         (map starling-transaction->transaction-and-balance))))
-
 (defn assoc-recurring-transfer [token savings-goal]
   (go
     (if (= (:total-saved savings-goal) (:target savings-goal))
@@ -120,3 +108,15 @@
   (go (->> (savings-goals env-vars)
            <!
            (map savings-goal->future-transactions))))
+
+(defn past-transactions [{:keys [STARLING_TOKEN]}]
+  (go
+    (->> {:hostname "api.starlingbank.com"
+          :path "/api/v1/transactions"
+          :headers {:Authorization (str "Bearer " STARLING_TOKEN)}}
+         utils/https-get-async
+         <!
+         (.parse js/JSON)
+         js->clj
+         (#(get-in % ["_embedded" "transactions"]))
+         (map starling-transaction->transaction-and-balance))))

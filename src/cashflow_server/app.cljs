@@ -19,14 +19,12 @@
   (let [initialized-routes (routes/initialize env-vars)]
     (-> (express)
         (.use cors-handler)
-        (.get "/transactions-and-balances/starling"
-              (get-in initialized-routes [:transactions-and-balances :starling]))
-        (.get "/transactions/amex"
-              (get-in initialized-routes [:transactions :amex]))
-        (.get "/transactions/recurring"
-              (get-in initialized-routes [:transactions :recurring]))
-        (.get "/transactions/adjustment"
-              (get-in initialized-routes [:transactions :adjustment]))
-        (.get "/transactions/starling-future"
-              (get-in initialized-routes [:transactions :starling-future]))
+        (.get "/transactions/past/adjustment"
+              (get-in initialized-routes [:transactions :past :adjustment]))
+        (.get "/transactions/past/amex"
+              (get-in initialized-routes [:transactions :past :amex]))
+        (.get "/transactions/future/starling"
+              (get-in initialized-routes [:transactions :future :starling]))
+        (.get "/transactions/future/recurring"
+              (get-in initialized-routes [:transactions :future :recurring]))
         (.use error-handler))))

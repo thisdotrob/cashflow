@@ -10,10 +10,7 @@
   (fn [req res] (go (.send res (clj->js (<! (f env-vars)))))))
 
 (defn initialize [env-vars]
-  {:transactions {:adjustment (route env-vars adjustment/transactions)
-                  :amex       (route env-vars amex/transactions)
-                  :recurring  (route env-vars recurring/transactions)
-                  :starling-future (route env-vars starling/future-transactions)}
-   :transactions-and-balances {:starling
-                               (route env-vars
-                                      starling/transactions-and-balances)}})
+  {:transactions {:past {:adjustment (route env-vars adjustment/transactions)
+                         :amex       (route env-vars amex/transactions)}
+                  :future {:starling (route env-vars starling/future-transactions)
+                           :recurring (route env-vars recurring/transactions)}}})

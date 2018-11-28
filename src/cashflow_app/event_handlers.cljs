@@ -19,28 +19,28 @@
 
 (def amex-transactions-data-http-opts
   {:method          :get
-   :uri             "http://localhost:3000/transactions/amex"
+   :uri             "http://localhost:3000/transactions/past/amex"
    :response-format (ajax/json-response-format {:keywords? true})
    :on-success      [:http-fetch-success :amex-transactions]
    :on-failure      [:http-fetch-fail]})
 
 (def starling-transactions-and-balances-data-http-opts
   {:method          :get
-   :uri             "http://localhost:3000/transactions-and-balances/starling"
+   :uri             "http://localhost:3000/transactions/past/starling"
    :response-format (ajax/json-response-format {:keywords? true})
    :on-success      [:http-fetch-success :starling-transactions-and-balances]
    :on-failure      [:http-fetch-fail]})
 
 (def recurring-transactions-data-http-opts
   {:method          :get
-   :uri             "http://localhost:3000/transactions/recurring"
+   :uri             "http://localhost:3000/transactions/future/recurring"
    :response-format (ajax/json-response-format {:keywords? true})
    :on-success      [:http-fetch-success :recurring-transactions]
    :on-failure      [:http-fetch-fail]})
 
 (def adjustment-transactions-data-http-opts
   {:method          :get
-   :uri             "http://localhost:3000/transactions/adjustment"
+   :uri             "http://localhost:3000/transactions/past/adjustment"
    :response-format (ajax/json-response-format {:keywords? true})
    :on-success      [:http-fetch-success :adjustment-transactions]
    :on-failure      [:http-fetch-fail]})
