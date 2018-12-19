@@ -12,7 +12,7 @@
 (defn range-months-to-add [transaction today]
   (if (< (:day transaction) (date/get-day today))
     (range 1 (+ 1 NUM-FUTURE-MONTHLY-TRANSACTIONS))
-    (range 0 (NUM-FUTURE-MONTHLY-TRANSACTIONS))))
+    (range 0 NUM-FUTURE-MONTHLY-TRANSACTIONS)))
 
 (defn future-monthly-transaction [today recurring-transaction months-to-add]
   (let [{:keys [narrative amount day]} recurring-transaction
