@@ -31,7 +31,7 @@
 (defn fetch-past-transactions [{:keys [STARLING_TOKEN]}]
   (go
     (->> {:hostname "api.starlingbank.com"
-          :path "/api/v1/transactions"
+          :path "/api/v1/transactions?from=2017-12-01"
           :headers {:Authorization (str "Bearer " STARLING_TOKEN)}}
          utils/https-get-async
          <!
