@@ -45,5 +45,8 @@ Next run `npm run app-watch` in a seperate terminal. Once you see "Build complet
 app at `http://localhost:8020`.
 
 # TODO:
-Recurring transactions starting after date X.
-One off transactions.
+- Unify format of recurring transactions around Starling schema.
+- Docker-compose everything.
+- Recurring transactions starting after date X.
+- One off transactions.
+- Migrate to v2 of Starling API.
