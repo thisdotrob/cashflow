@@ -7,11 +7,11 @@
                 [day8.re-frame/http-fx "0.1.6"]
                 [cljs-ajax "0.8.0"]]
 
- :builds {:server {:main cashflow-server.main/start!
+ :builds {:server {:main cashflow-server.core/start!
                    :target :node-script
                    :output-to "out/cashflow-server.js"
-                   :devtools {:after-load cashflow-server.main/start!
-                              :before-load cashflow-server.main/stop!}}
+                   :devtools {:after-load cashflow-server.core/start!
+                              :before-load cashflow-server.core/stop!}}
           :test {:target :node-test
                  :output-to "out/cashflow-server-tests.js"
                  :autorun true}
