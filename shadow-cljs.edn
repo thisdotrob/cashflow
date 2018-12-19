@@ -12,9 +12,6 @@
                    :output-to "out/cashflow-server.js"
                    :devtools {:after-load cashflow-server.core/start!
                               :before-load cashflow-server.core/stop!}}
-          :test {:target :node-test
-                 :output-to "out/cashflow-server-tests.js"
-                 :autorun true}
           :app {:modules {:main {:entries [cashflow-app.core]}}
                 :target :browser
                 :output-dir "public/js"

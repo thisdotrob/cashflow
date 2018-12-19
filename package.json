@@ -10,7 +10,6 @@
   "scripts": {
     "shadow-start": "shadow-cljs server start",
     "server-watch": "shadow-cljs watch server",
-    "server-test": "shadow-cljs watch test",
     "server-release": "shadow-cljs release server",
     "server-start": "node out/cashflow-server.js",
     "amex-scrape": "node amex-scrape-puppeteer.js",
