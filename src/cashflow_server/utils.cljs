@@ -37,7 +37,7 @@
               :headers headers}]
     (.get https
           (clj->js opts)
-          (fn [res] 
+          (fn [res]
             (.setEncoding res "utf8")
             (if (not= 200 (.-statusCode res))
               (throw (str "Non 200 received from: " hostname path)))

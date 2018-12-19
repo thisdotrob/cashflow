@@ -6,16 +6,10 @@
 (rf/reg-event-db
  :initialise-db
  (fn [_ _]
-   {:amex-repayment-inline-end-date "2018-10-16"
-    :adjustment-transactions []
+   {:adjustment-transactions []
     :amex-transactions []
     :starling-transactions-and-balances []
     :recurring-transactions []}))
-
-(rf/reg-event-db
- :set-active-panel
- (fn [db [_ active-panel]]
-   (assoc db :active-panel active-panel)))
 
 (def amex-transactions-data-http-opts
   {:method          :get
@@ -46,32 +40,13 @@
    :on-failure      [:http-fetch-fail]})
 
 (rf/reg-event-fx
- :request-active-data
+ :request-data
  (fn [{:keys [db]} [_ data-name]]
-   (case data-name
-     :amex-transactions-data
-     {:db db
-      :http-xhrio amex-transactions-data-http-opts}
-
-     :starling-transactions-data
-     {:db db
-      :http-xhrio starling-transactions-and-balances-data-http-opts}
-
-     :recurring-transactions-data
-     {:db db
-      :http-xhrio recurring-transactions-data-http-opts}
-
-     :adjustment-transactions-data
-     {:db db
-      :http-xhrio adjustment-transactions-data-http-opts}
-
-     :cashflow-data
-     {:db db
-      :http-xhrio [adjustment-transactions-data-http-opts
-                   amex-transactions-data-http-opts
-                   starling-transactions-and-balances-data-http-opts
-                   recurring-transactions-data-http-opts]}
-     {:db db})))
+   {:db db
+    :http-xhrio [adjustment-transactions-data-http-opts
+                 amex-transactions-data-http-opts
+                 starling-transactions-and-balances-data-http-opts
+                 recurring-transactions-data-http-opts]}))
 
 (rf/reg-event-db
   :http-fetch-success

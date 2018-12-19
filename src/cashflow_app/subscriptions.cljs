@@ -2,18 +2,6 @@
   (:require [re-frame.core :as rf]))
 
 (rf/reg-sub
-  :initialising?
-  (fn [db _]
-    (if db
-      false
-      true)))
-
-(rf/reg-sub
- :active-panel
- (fn [db _]
-   (:active-panel db)))
-
-(rf/reg-sub
  :amex-transactions
  (fn [db _]
    (sort-by :date
@@ -25,11 +13,7 @@
   :starling-transactions
   (fn [db _]
     (sort-by :date
-             (filter #(or (-> (:date %)
-                              (subs 0 10)
-                              (<= (:amex-repayment-inline-end-date db)))
-                          (-> (:narrative %)
-                              (not= "American Express")))
+             (filter #(-> (:narrative %) (not= "American Express"))
                      (:starling-transactions-and-balances db)))))
 
 (rf/reg-sub
@@ -57,11 +41,6 @@
                     starling-transactions
                     amex-transactions
                     adjustment-transactions))))
-
-(rf/reg-sub
-  :start-date
-  (fn [db _]
-    (:start-date db)))
 
 (defn balance [prev-balance transaction]
   (if (nil? prev-balance)
