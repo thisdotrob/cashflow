@@ -1,12 +1,3 @@
-node_modules
-.shadow-cljs
-.nrepl-port
-out
 .env
-amex.csv
-recurring.json
-adjustments.json
-one_off.json
+user_data
 .*.swp
-public/js
-screenshot*

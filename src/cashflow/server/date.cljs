@@ -1,4 +1,4 @@
-(ns cashflow-server.date
+(ns cashflow.server.date
   (:require ["date-fns" :as date]))
 
 (defn date->str [d]

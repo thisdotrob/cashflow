@@ -1,0 +1,42 @@
+version: "3.7"
+
+services:
+  build:
+    build:
+      context: .
+      args:
+        UID: ${UID}
+        GID: ${GID}
+    environment:
+      - STARLING_TOKEN
+    volumes:
+      - ./user_data:/home/dockeruser/app/user_data
+      - ./public/index.html:/home/dockeruser/app/public/index.html
+      - ./public/css/style.css:/home/dockeruser/app/public/css/style.css
+      - ./src:/home/dockeruser/app/src
+      - m2_cache:/home/dockeruser/.m2
+      - amex_data:/home/dockeruser/app/amex_data
+    ports:
+      - 8020:8020
+      - 9630:9630
+      - 38175:38175
+      - 45419:45419
+      - 3000:3000
+
+  amex-scraper:
+    build:
+      context: ./amex_scraper
+      args:
+        UID: ${UID}
+        GID: ${GID}
+    cap_add:
+      - SYS_ADMIN
+    environment:
+      - AMEX_USERNAME
+      - AMEX_PASSWORD
+    volumes:
+      - amex_data:/home/dockeruser/app/amex_data
+
+volumes:
+  amex_data:
+  m2_cache:

@@ -1,4 +1,4 @@
-(ns cashflow-server.env)
+(ns cashflow.server.env)
 
 (def get-env-var (partial aget (.-env js/process)))
 

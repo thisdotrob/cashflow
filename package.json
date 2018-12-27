@@ -1,34 +1,32 @@
 {
-  "name": "cashflow",
+  "name": "cashflow-app",
   "version": "1.0.0",
-  "description": "",
+  "description": "cljs cashflow app",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/thisdotrob/cashflow.git"
   },
   "main": "index.js",
   "scripts": {
-    "shadow-start": "shadow-cljs server start",
-    "server-watch": "shadow-cljs watch server",
-    "server-release": "shadow-cljs release server",
-    "server-start": "node out/cashflow-server.js",
-    "amex-scrape": "node amex-scrape-puppeteer.js",
-    "app-watch": "shadow-cljs watch app"
+    "build": "shadow-cljs watch server client",
+    "dc-up": "GID=$(id -g) UID=$(id -u) docker-compose up --build",
+    "start": "GID=$(id -g) UID=$(id -u) docker-compose exec build node out/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "shadow-cljs": "^2.7.6"
+    "shadow-cljs": "^2.7.6",
+    "source-map-support": "^0.5.9"
   },
   "dependencies": {
     "create-react-class": "^15.6.3",
-    "date-fns": "^1.29.0",
+    "date-fns": "^1.30.1",
     "express": "^4.16.4",
-    "puppeteer": "^1.10.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-flip-move": "^3.0.3",
-    "react-highlight.js": "^1.0.7"
+    "react-highlight.js": "^1.0.7",
+    "ws": "^6.1.2"
   }
 }

@@ -1,9 +1,9 @@
-(ns cashflow-app.core
+(ns cashflow.client.core
   (:require [reagent.core :as reagent]
             [re-frame.core :as rf]
-            [cashflow-app.event-handlers :as events]
-            [cashflow-app.subscriptions :as subscriptions]
-            [cashflow-app.views :as views]))
+            [cashflow.client.event-handlers :as events]
+            [cashflow.client.subscriptions :as subscriptions]
+            [cashflow.client.views :as views]))
 
 (defn ^:export init []
   (rf/dispatch-sync [:initialise-db])

@@ -115,7 +115,7 @@ const main = async () => {
   await browser.close();
 
   console.log("Moving file...");
-  fs.copyFileSync("/tmp/ofx.csv", "./amex.csv");
+  fs.copyFileSync("/tmp/ofx.csv", "./amex_data/amex.csv");
 
   console.log("Removing temporary file...");
   fs.unlinkSync("/tmp/ofx.csv");

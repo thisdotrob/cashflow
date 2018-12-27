@@ -1,10 +1,10 @@
-(ns cashflow-server.recurring
+(ns cashflow.server.recurring
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.core.async :refer [>!]]
             [clojure.string :as string]
             ["fs" :as fs]
-            [cashflow-server.date :as date]
-            [cashflow-server.utils :as utils]))
+            [cashflow.server.date :as date]
+            [cashflow.server.utils :as utils]))
 
 (def NUM-FUTURE-WEEKLY-TRANSACTIONS 40)
 (def NUM-FUTURE-MONTHLY-TRANSACTIONS 10)
@@ -69,7 +69,7 @@
        flatten))
 
 (defn transactions [_]
-  (go (let [recurring-transactions (->> "recurring.json"
+  (go (let [recurring-transactions (->> "user_data/recurring.json"
                                         read-file-async
                                         <!
                                         json->clj

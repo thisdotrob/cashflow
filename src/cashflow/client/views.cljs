@@ -1,7 +1,7 @@
-(ns cashflow-app.views
+(ns cashflow.client.views
   (:require [re-frame.core :as rf]
             [clojure.string :as string]
-            [cashflow-app.subscriptions :as subscriptions]))
+            [cashflow.client.subscriptions :as subscriptions]))
 
 (defn display-date [iso-string-date]
   (-> iso-string-date

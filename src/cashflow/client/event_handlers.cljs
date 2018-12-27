@@ -1,4 +1,4 @@
-(ns cashflow-app.event-handlers
+(ns cashflow.client.event-handlers
   (:require [re-frame.core :as rf]
             [day8.re-frame.http-fx]
             [ajax.core :as ajax]))

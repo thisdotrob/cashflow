@@ -1,4 +1,4 @@
-(ns cashflow-server.amex
+(ns cashflow.server.amex
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require ["fs" :as fs]
             [goog.labs.format.csv :as csv]
@@ -6,7 +6,7 @@
             goog.string.format
             [cljs.core.async :refer [<!]]
             [clojure.string :as string]
-            [cashflow-server.utils :as utils]))
+            [cashflow.server.utils :as utils]))
 
 (defn amex-amount->amount [amount]
   (->> amount
@@ -35,5 +35,5 @@
     (map amex-csv-row->transaction
          (csv/parse (<! (utils/js-invoke-async fs
                                                "readFile"
-                                               "./amex.csv"
+                                               "./amex_data/amex.csv"
                                                "utf8"))))))

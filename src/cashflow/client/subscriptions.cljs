@@ -1,4 +1,4 @@
-(ns cashflow-app.subscriptions
+(ns cashflow.client.subscriptions
   (:require [re-frame.core :as rf]))
 
 (rf/reg-sub

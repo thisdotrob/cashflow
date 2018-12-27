@@ -1,12 +1,12 @@
-(ns cashflow-server.starling
+(ns cashflow.server.starling
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [goog.string :as gstring]
             goog.string.format
             [cljs.core.async :as async :refer [<!]]
             [clojure.string :as string]
             ["fs" :as fs]
-            [cashflow-server.date :as date]
-            [cashflow-server.utils :as utils]))
+            [cashflow.server.date :as date]
+            [cashflow.server.utils :as utils]))
 
 (defn savings-goal->recurrence-rule [savings-goal]
   (let [recurring-transfer (get savings-goal "recurringTransfer")

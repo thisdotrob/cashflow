@@ -1,4 +1,4 @@
-(ns cashflow-server.utils
+(ns cashflow.server.utils
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.core.async :refer [>!] :as a]
             ["https" :as https]))

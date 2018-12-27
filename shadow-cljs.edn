@@ -7,16 +7,17 @@
                 [day8.re-frame/http-fx "0.1.6"]
                 [cljs-ajax "0.8.0"]]
 
- :builds {:server {:main cashflow-server.core/start!
+ :builds {:client {:modules {:main {:entries [cashflow.client.core]}}
+                   :target :browser
+                   :output-dir "public/js"
+                   :asset-path "/js"
+                   :devtools {:http-root "public"
+                              :http-port 8020
+                              :preloads [devtools.preload]}
+                   :release {:output-dir "dist/js"}}
+          :server {:main cashflow.server.core/main
                    :target :node-script
-                   :output-to "out/cashflow-server.js"
-                   :devtools {:after-load cashflow-server.core/start!
-                              :before-load cashflow-server.core/stop!}}
-          :app {:modules {:main {:entries [cashflow-app.core]}}
-                :target :browser
-                :output-dir "public/js"
-                :assest-path "/js"
-                :devtools {:http-root "public"
-                           :http-port 8020
-                           :preloads [devtools.preload]}
-                :release {:output-dir "dist/js"}}}}
+                   :output-to "out/server.js"
+                   :devtools {:enabled true
+                              :before-load-async cashflow.server.core/stop
+                              :after-load cashflow.server.core/start}}}}

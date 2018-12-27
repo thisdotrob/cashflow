@@ -1,14 +1,9 @@
-To start developing, install the dependencies with `npm i`, then start a
-shadow-cljs server process with `npm run shadow-start`.
-
-The following environment variables must be set:
+To start developing, the following environment variables must be set:
 - STARLING_TOKEN
 - AMEX_USERNAME
 - AMEX_PASSWORD
 
-First scrape the amex transactions using `npm run amex-scrape` until you see "Finished!".
-
-Save a list of recurring transactions in the following format in `recurring.json`.
+Save a list of recurring transactions in the following format in `user_data/recurring.json`.
 ```
 [
   {
@@ -26,7 +21,7 @@ Save a list of recurring transactions in the following format in `recurring.json
 ]
 ```
 
-Save a list of adjustment transactions in the following format in `adjustments.json`.
+Save a list of adjustment transactions in the following format in `user_data/adjustments.json`.
 ```
 [
   {
@@ -37,16 +32,14 @@ Save a list of adjustment transactions in the following format in `adjustments.j
 ]
 ```
 
-Next enter `npm run server-watch` until you see "Build completed."
+Run `npm run dc-up`.
 
-Next run `npm run server-start` in a separate terminal. The server will now be listening on port 3000.
-
-Next run `npm run app-watch` in a seperate terminal. Once you see "Build completed." you can load the
-app at `http://localhost:8020`.
+When you see `[:server] Build completed.` and `[:client] Build completed.`, run `npm start`.
+The app should then be available at `http://localhost:8020`.
 
 # TODO:
 - Unify format of recurring transactions around Starling schema.
-- Docker-compose everything.
+- Move user_data to a db or something
 - Recurring transactions starting after date X.
 - One off transactions.
 - Migrate to v2 of Starling API.

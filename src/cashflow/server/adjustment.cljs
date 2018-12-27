@@ -1,8 +1,8 @@
-(ns cashflow-server.adjustment
+(ns cashflow.server.adjustment
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.core.async :refer [>!]]
             ["fs" :as fs]
-            [cashflow-server.utils :as utils]))
+            [cashflow.server.utils :as utils]))
 
 (defn json->clj [json]
   (js->clj (js-invoke js/JSON "parse" json) :keywordize-keys true))
@@ -17,7 +17,7 @@
   (assoc transaction :source "Adjustment"))
 
 (defn transactions [_]
-  (go (->> "adjustments.json"
+  (go (->> "user_data/adjustments.json"
            read-file-async
            <!
            json->clj
