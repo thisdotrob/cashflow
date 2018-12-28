@@ -38,8 +38,11 @@ When you see `[:server] Build completed.` and `[:client] Build completed.`, run 
 The app should then be available at `http://localhost:8020`.
 
 # TODO:
+- Toggles for transaction types
 - Unify format of recurring transactions around Starling schema.
 - Move user_data to a db or something
 - Recurring transactions starting after date X.
 - One off transactions.
 - Migrate to v2 of Starling API.
+- Stop timeouts from starling crashing the server
+- Add route info logs to server
