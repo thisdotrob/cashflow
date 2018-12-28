@@ -9,7 +9,11 @@
    {:adjustment-transactions []
     :amex-transactions []
     :starling-transactions-and-balances []
-    :recurring-transactions []}))
+    :recurring-transactions []
+    :filters {:amex true
+              :starling true
+              :recurring true
+              :adjustments true}}))
 
 (def amex-transactions-data-http-opts
   {:method          :get
@@ -57,3 +61,8 @@
   :http-fetch-fail
   (fn [db [_ error-map]]
     (assoc db :http-error error-map)))
+
+(rf/reg-event-db
+  :toggle-filter
+  (fn [db [_ filter-key]]
+    (update-in db [:filters filter-key] #(not %))))

@@ -32,15 +32,17 @@
  :<- [:starling-transactions]
  :<- [:amex-transactions]
  :<- [:adjustment-transactions]
+ :<- [:filters]
  (fn [[recurring-transactions
        starling-transactions
        amex-transactions
-       adjustment-transactions] _]
+       adjustment-transactions
+       filters] _]
    (sort-by :date
-            (concat recurring-transactions
-                    starling-transactions
-                    amex-transactions
-                    adjustment-transactions))))
+            (concat (if (:recurring filters) recurring-transactions)
+                    (if (:starling filters) starling-transactions)
+                    (if (:amex filters) amex-transactions)
+                    (if (:adjustments filters) adjustment-transactions)))))
 
 (defn balance [prev-balance transaction]
   (if (nil? prev-balance)
@@ -70,3 +72,8 @@
                                     transaction))))
             []
             all-transactions)))
+
+(rf/reg-sub
+  :filters
+  (fn [db _]
+    (:filters db)))

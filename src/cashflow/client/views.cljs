@@ -18,16 +18,35 @@
    [:td balance]])
 
 (defn main []
-  (let [transactions @(rf/subscribe [:cashflow-transactions-and-balances])]
+  (let [transactions @(rf/subscribe [:cashflow-transactions-and-balances])
+        filters @(rf/subscribe [:filters])]
     [:div
-     [:table {:style {:width "100%"}}
-      [:thead
-       [:tr
-        [:td "Date"]
-        [:td "Source"]
-        [:td "Desc"]
-        [:td "Amount"]
-        [:td "Balance"]]]
-      [:tbody
-       (for [t transactions]
-         ^{:key (:id t)} [row t])]]]))
+     [:div
+      [:input {:type "checkbox"
+               :on-change #(rf/dispatch [:toggle-filter :amex])
+               :checked (:amex filters)}]
+      [:label "Amex"]
+      [:input {:type "checkbox"
+               :on-change #(rf/dispatch [:toggle-filter :starling])
+               :checked (:starling filters)}]
+      [:label "Starling"]
+      [:input {:type "checkbox"
+               :on-change #(rf/dispatch [:toggle-filter :recurring])
+               :checked (:recurring filters)}]
+      [:label "Recurring"]
+      [:input {:type "checkbox"
+               :on-change #(rf/dispatch [:toggle-filter :adjustments])
+               :checked (:adjustments filters)}]
+      [:label "Adjustment"]]
+     [:div
+      [:table {:style {:width "100%"}}
+       [:thead
+        [:tr
+         [:td "Date"]
+         [:td "Source"]
+         [:td "Desc"]
+         [:td "Amount"]
+         [:td "Balance"]]]
+       [:tbody
+        (for [t transactions]
+          ^{:key (:id t)} [row t])]]]]))
