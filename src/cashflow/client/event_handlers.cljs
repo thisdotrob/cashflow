@@ -13,7 +13,8 @@
     :filters {:amex true
               :starling true
               :recurring true
-              :adjustments true}}))
+              :adjustments true
+              :one-off true}}))
 
 (def amex-transactions-data-http-opts
   {:method          :get
@@ -43,11 +44,19 @@
    :on-success      [:http-fetch-success :adjustment-transactions]
    :on-failure      [:http-fetch-fail]})
 
+(def one-off-transactions-data-http-opts
+  {:method          :get
+   :uri             "http://localhost:3000/transactions/one_off"
+   :response-format (ajax/json-response-format {:keywords? true})
+   :on-success      [:http-fetch-success :one-off-transactions]
+   :on-failure      [:http-fetch-fail]})
+
 (rf/reg-event-fx
  :request-data
  (fn [{:keys [db]} [_ data-name]]
    {:db db
     :http-xhrio [adjustment-transactions-data-http-opts
+                 one-off-transactions-data-http-opts
                  amex-transactions-data-http-opts
                  starling-transactions-and-balances-data-http-opts
                  recurring-transactions-data-http-opts]}))

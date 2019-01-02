@@ -4,6 +4,7 @@
             [cashflow.server.amex :as amex]
             [cashflow.server.recurring :as recurring]
             [cashflow.server.adjustment :as adjustment]
+            [cashflow.server.one-off :as one-off]
             [cljs.core.async :refer [<!]]
             ["express" :as express]
             [cashflow.server.env :as env]))
@@ -28,6 +29,7 @@
   (-> (express)
       (.use cors-handler)
       (.get "/transactions/adjustment" (route env-vars adjustment/transactions))
+      (.get "/transactions/one_off" (route env-vars one-off/transactions))
       (.get "/transactions/amex" (route env-vars amex/transactions))
       (.get "/transactions/recurring" (route env-vars recurring/transactions))
       (.get "/transactions/starling" (route env-vars starling/transactions))

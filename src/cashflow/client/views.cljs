@@ -35,6 +35,10 @@
                :checked (:recurring filters)}]
       [:label "Recurring"]
       [:input {:type "checkbox"
+               :on-change #(rf/dispatch [:toggle-filter :one-off])
+               :checked (:one-off filters)}]
+      [:label "One-off"]
+      [:input {:type "checkbox"
                :on-change #(rf/dispatch [:toggle-filter :adjustments])
                :checked (:adjustments filters)}]
       [:label "Adjustment"]]
