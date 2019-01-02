@@ -33,7 +33,11 @@
       (.get "/transactions/amex" (route env-vars amex/transactions))
       (.get "/transactions/recurring" (route env-vars recurring/transactions))
       (.get "/transactions/starling" (route env-vars starling/transactions))
-      (.use error-handler)))
+      (.use error-handler)
+      (.listen 3000 (fn [err]
+                      (if err
+                        (js/console.error "server start failed")
+                        (js/console.info "http server running"))))))
 
 (defonce server-ref
   (volatile! nil))
@@ -43,13 +47,8 @@
 (defn main [& args]
   (js/console.log "starting server")
   (let [server (->> env-keys
-                    env/validate
-                    init-server)]
-    (.listen server 3000
-      (fn [err]
-        (if err
-          (js/console.error "server start failed")
-          (js/console.info "http server running"))))
+                 env/validate
+                 init-server)]
     (vreset! server-ref server)))
 
 (defn start
