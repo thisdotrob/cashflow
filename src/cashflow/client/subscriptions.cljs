@@ -1,5 +1,6 @@
 (ns cashflow.client.subscriptions
-  (:require [re-frame.core :as rf]))
+  (:require [re-frame.core :as rf]
+            [cashflow.client.date :as date]))
 
 (rf/reg-sub
  :amex-transactions
@@ -12,9 +13,11 @@
 (rf/reg-sub
   :starling-transactions
   (fn [db _]
-    (sort-by :date
-             (filter #(-> (:narrative %) (not= "American Express"))
-                     (:starling-transactions-and-balances db)))))
+    (->> db
+         :starling-transactions-and-balances
+         (filter #(or (date/is-before? (:date %) "2018-12-05")
+                      (not= (:narrative %) "American Express")))
+         (sort-by :date))))
 
 (rf/reg-sub
  :adjustment-transactions
