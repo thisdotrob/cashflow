@@ -107,7 +107,7 @@
               {:source "Starling"
                :narrative narrative
                :amount amount
-               :date (str date "T23:59:59.999Z")
+               :date (str date "T01:30:00.000Z") ;; savings goals get taken at about this time
                :id (str narrative
                         amount
                         date)}))))
@@ -119,7 +119,9 @@
                        (<! (fetch-savings-goals env-vars)))
                   (map scheduled-payment->recurrence-rule
                        (<! (fetch-scheduled-payments env-vars))))]
-      (mapcat recurrence-rule->future-transactions recurrence-rules))))
+      (->> recurrence-rules
+           (mapcat recurrence-rule->future-transactions)
+           (filter #(date/in-future? (:date %)))))))
 
 (defn past-transactions [env-vars]
   (go

@@ -38,3 +38,6 @@
     (-> today
         (date/addDays days-to-add)
         date->str)))
+
+(defn in-future? [d]
+  (date/isAfter d (js/Date.)))
