@@ -5,13 +5,15 @@
             [cljs.core.async :as async :refer [<!]]
             [clojure.string :as string]
             ["fs" :as fs]
+            [cashflow.server.recurring :as recurring]
             [cashflow.server.date :as date]
             [cashflow.server.utils :as utils]))
 
 (defn savings-goal->recurrence-rule [savings-goal]
   (let [recurring-transfer (get savings-goal "recurringTransfer")
         recurrence-rule (get recurring-transfer "recurrenceRule")]
-    {:start-date (get recurrence-rule "startDate")
+    {:source "Starling"
+     :start-date (get recurrence-rule "startDate")
      :frequency (get recurrence-rule "frequency")
      :interval (get recurrence-rule "interval")
      :count (get recurrence-rule "count")
@@ -21,12 +23,13 @@
 
 (defn scheduled-payment->recurrence-rule [scheduled-payment]
   (let [recurrence-rule (get scheduled-payment "recurrenceRule")]
-    {:start-date (get recurrence-rule "startDate")
-    :frequency (get recurrence-rule "frequency")
-    :interval (get recurrence-rule "interval")
-    :count (get recurrence-rule "count")
-    :amount (* -1 (get scheduled-payment "amount"))
-    :narrative (get scheduled-payment "reference")}))
+    {:source "Starling"
+     :start-date (get recurrence-rule "startDate")
+     :frequency (get recurrence-rule "frequency")
+     :interval (get recurrence-rule "interval")
+     :count (get recurrence-rule "count")
+     :amount (* -1 (get scheduled-payment "amount"))
+     :narrative (get scheduled-payment "reference")}))
 
 (defn fetch-past-transactions [{:keys [STARLING_TOKEN]}]
   (go
@@ -85,33 +88,6 @@
            (#(get-in % ["_embedded" "paymentOrders"]))
            (filter in-future?)))))
 
-(defn recurrence-rule->payment-dates
-  [{:keys [count frequency interval start-date] :as recurrence-rule}]
-  (let [one-off-payment? (and (= 1 count)
-                              (nil? frequency)
-                              (nil? interval))
-        add-fn (if (= "MONTHLY" frequency)
-                 date/add-months
-                 date/add-weeks)]
-    (if one-off-payment?
-      [start-date]
-      (->> (range 0 count)
-           (map #(* interval %))
-           (map #(str (add-fn start-date %)))))))
-
-(defn recurrence-rule->future-transactions
-  [{:keys [amount narrative] :as recurrence-rule}]
-  (->> recurrence-rule
-       recurrence-rule->payment-dates
-       (map (fn [date]
-              {:source "Starling"
-               :narrative narrative
-               :amount amount
-               :date (str date "T01:30:00.000Z") ;; savings goals get taken at about this time
-               :id (str narrative
-                        amount
-                        date)}))))
-
 (defn future-transactions [env-vars]
   (go
     (let [recurrence-rules
@@ -119,9 +95,7 @@
                        (<! (fetch-savings-goals env-vars)))
                   (map scheduled-payment->recurrence-rule
                        (<! (fetch-scheduled-payments env-vars))))]
-      (->> recurrence-rules
-           (mapcat recurrence-rule->future-transactions)
-           (filter #(date/in-future? (:date %)))))))
+      (recurring/recurrence-rules->future-transactions recurrence-rules))))
 
 (defn past-transactions [env-vars]
   (go

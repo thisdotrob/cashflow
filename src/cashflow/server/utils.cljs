@@ -1,6 +1,7 @@
 (ns cashflow.server.utils
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.core.async :refer [>!] :as a]
+            ["fs" :as fs]
             ["https" :as https]))
 
 (defn js-invoke-async [js-obj f-name & args]
@@ -44,3 +45,9 @@
             (.on res "data" #(go (>! ch %)))
             (.on res "end" #(go (a/close! ch)))))
     (a/reduce #(str %1 %2) "" ch)))
+
+(defn json->clj [json]
+  (js->clj (js-invoke js/JSON "parse" json) :keywordize-keys true))
+
+(defn read-file-async [filename]
+  (js-invoke-async fs "readFile" filename "utf8"))
